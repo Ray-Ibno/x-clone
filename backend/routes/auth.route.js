@@ -10,8 +10,8 @@ import { authenticateUser } from '../middleware/authorizeUser.js'
 const router = express.Router()
 
 router.get('/user', authenticateUser, getUser)
-router.post('/auth/signup', signup)
-router.post('/auth/login', login)
-router.post('/auth/logout', logout)
+router.post('/signup', signup)
+router.post('/login', login)
+router.post('/logout', logout)
 
 export default router

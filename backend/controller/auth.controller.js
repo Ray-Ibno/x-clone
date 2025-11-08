@@ -4,11 +4,11 @@ import generateTokenAndSetCookie from '../utils/generateToken.js'
 
 export const signup = async (req, res) => {
   const { username, fullName, password, email } = req.body
-  const saltRounds = 10
-  const hashedPassword = await bcrypt.hash(password, saltRounds)
-
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  const saltRounds = 10
+
   try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Invalid email format' })
     }

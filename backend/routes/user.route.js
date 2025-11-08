@@ -1,35 +1,17 @@
 import express from 'express'
-import User from '../models/user.model.js'
+import { authenticateUser } from '../middleware/authorizeUser.js'
+import {
+  getUser,
+  followUnfollow,
+  updateUserProfile,
+  getSuggestedUsers,
+} from '../controller/users.controller.js'
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.find({})
-
-    res.status(200).json(users)
-  } catch (error) {
-    res.status(500).json({ error: 'Server Error' })
-  }
-})
-
-router.get('/user/:id', async (req, res) => {})
-
-router.delete('/user/delete/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    const user = await User.findById({ _id: id })
-
-    if (!user) {
-      res.status(400).json({ success: false, message: 'No user found' })
-    }
-
-    res
-      .status(200)
-      .json({ success: true, message: 'account successfully deleted' })
-  } catch (error) {
-    res.status(500).json({ error: 'internal server error' })
-  }
-})
+router.get('/profile/:username', authenticateUser, getUser)
+router.get('/suggested', authenticateUser, getSuggestedUsers)
+router.post('/follow/:id', authenticateUser, followUnfollow)
+router.post('/update', authenticateUser, updateUserProfile)
 
 export default router
