@@ -2,6 +2,7 @@ import { CiImageOn } from 'react-icons/ci'
 import { BsEmojiSmileFill } from 'react-icons/bs'
 import { useRef, useState } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
+import useGetUser from '../../hooks/useGetUser'
 
 const CreatePost = () => {
   const [text, setText] = useState('')
@@ -12,9 +13,7 @@ const CreatePost = () => {
   const isPending = false
   const isError = false
 
-  const data = {
-    profileImg: '/avatars/boy1.png',
-  }
+  const { data } = useGetUser()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

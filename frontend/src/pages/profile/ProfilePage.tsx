@@ -5,14 +5,16 @@ import Posts from '../../components/common/Posts'
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import EditProfileModal from './EditProfileModal'
 
-import { POSTS } from '../../utils/db/dummy'
-
 import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
+import useGetUser from '../../hooks/useGetUser'
 
 const ProfilePage = () => {
+  const { data: user, isLoading } = useGetUser()
+  const POSTS = user.posts
+
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
   const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(
     null
@@ -22,20 +24,7 @@ const ProfilePage = () => {
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 
-  const isLoading = false
   const isMyProfile = true
-
-  const user = {
-    _id: '1',
-    fullName: 'John Doe',
-    username: 'johndoe',
-    profileImg: '/avatars/boy2.png',
-    coverImg: '/cover.png',
-    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    link: 'https://youtube.com/@asaprogrammer_',
-    following: ['1', '2', '3'],
-    followers: ['1', '2', '3'],
-  }
 
   const handleImgChange = (
     e: React.ChangeEvent<HTMLInputElement>,

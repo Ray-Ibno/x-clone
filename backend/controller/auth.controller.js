@@ -3,35 +3,40 @@ import bcrypt from 'bcryptjs'
 import generateTokenAndSetCookie from '../utils/generateToken.js'
 
 export const signup = async (req, res) => {
-  const { username, fullName, password, email } = req.body
+  const { username, fullName, password, email, passwordRepeat } = req.body
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   const saltRounds = 10
 
   try {
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    if (!username || !fullName || !password || !email || !passwordRepeat) {
+      return res.status(400).json({ error: 'Please input all fields' })
+    }
+
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Invalid email format' })
     }
 
-    const userExists = await User.findOne({ username })
-    if (userExists) {
-      return res
-        .status(400)
-        .json({ error: true, message: 'username already exists' })
-    }
-
     const emailExists = await User.findOne({ email })
     if (emailExists) {
-      return res
-        .status(400)
-        .json({ error: true, message: 'email already exists' })
+      return res.status(400).json({ error: 'email already exists' })
+    }
+
+    const userExists = await User.findOne({ username })
+    if (userExists) {
+      return res.status(400).json({ error: 'username already exists' })
     }
 
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ error: true, message: 'password must be 6 characters or more' })
+        .json({ error: 'password must be 6 characters or more' })
     }
+
+    if (password !== passwordRepeat) {
+      return res.status(400).json({ error: "password don't match" })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
 
     const newUser = await User.create({
       username,
@@ -73,9 +78,7 @@ export const login = async (req, res) => {
     )
 
     if (!user || !isPasswordMatched) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'invalid email or password' })
+      return res.status(400).json({ error: 'invalid email or password' })
     }
 
     generateTokenAndSetCookie(user.id, res)

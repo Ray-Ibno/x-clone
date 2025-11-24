@@ -7,6 +7,7 @@ import { MdOutlineMail } from 'react-icons/md'
 import { FaUser } from 'react-icons/fa'
 import { MdPassword } from 'react-icons/md'
 import { MdDriveFileRenameOutline } from 'react-icons/md'
+import useMutate from '../../../hooks/useMutate'
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -14,18 +15,19 @@ const SignUpPage = () => {
     username: '',
     fullName: '',
     password: '',
+    passwordRepeat: '',
   })
+
+  const { mutate, isError, isPending, error } = useMutate('signup')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(formData)
+    mutate(formData)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
-
-  const isError = false
 
   const inputElementDetails = [
     {
@@ -56,6 +58,13 @@ const SignUpPage = () => {
       name: 'password',
       value: formData.password,
     },
+    {
+      icon: <MdPassword />,
+      type: 'password',
+      placeholder: 'Re-Type Password',
+      name: 'passwordRepeat',
+      value: formData.passwordRepeat,
+    },
   ]
 
   return (
@@ -71,7 +80,10 @@ const SignUpPage = () => {
           <XSvg className="w-24 lg:hidden fill-white" />
           <h1 className="text-4xl font-extrabold text-white">Join today.</h1>
           {inputElementDetails.map((input) => (
-            <label className="input input-bordered rounded flex items-center gap-2 w-full">
+            <label
+              key={input.name}
+              className="input input-bordered rounded flex items-center gap-2 w-full"
+            >
               {input.icon}
               <input
                 type={input.type}
@@ -85,11 +97,9 @@ const SignUpPage = () => {
           ))}
 
           <button className="btn rounded-full btn-primary text-white text-xs">
-            Sign up
+            {isPending ? 'Loading...' : 'Sign up'}
           </button>
-          {isError && (
-            <p className="text-red-500 text-sm">Something went wrong</p>
-          )}
+          {isError && <p className="text-red-500 text-sm">{error.message}</p>}
         </form>
         <div className="flex flex-col w-full gap-2 mt-4">
           <p className="text-white text-sm">Already have an account?</p>

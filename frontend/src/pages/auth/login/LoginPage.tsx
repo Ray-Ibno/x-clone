@@ -6,22 +6,28 @@ import XSvg from '../../../components/svgs/X'
 import { MdOutlineMail } from 'react-icons/md'
 import { MdPassword } from 'react-icons/md'
 
+import useMutate from '../../../hooks/useMutate'
+
+type UserLogin = {
+  email: string
+  password: string
+}
+
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
+  const { mutate, isError, isPending, error } = useMutate('login')
+  const [formData, setFormData] = useState<UserLogin>({
+    email: '',
     password: '',
   })
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(formData)
+    mutate(formData)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
-
-  const isError = false
 
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen">
@@ -35,12 +41,12 @@ const LoginPage = () => {
           <label className="input input-bordered rounded flex items-center gap-2">
             <MdOutlineMail />
             <input
-              type="text"
+              type="email"
               className="grow"
-              placeholder="username"
-              name="username"
+              placeholder="email"
+              name="email"
               onChange={handleInputChange}
-              value={formData.username}
+              value={formData.email}
             />
           </label>
 
@@ -56,11 +62,9 @@ const LoginPage = () => {
             />
           </label>
           <button className="btn rounded-full btn-primary text-white text-xs">
-            Login
+            {isPending ? 'Logging in' : 'Login'}
           </button>
-          {isError && (
-            <p className="text-red-500 text-sm">Something went wrong</p>
-          )}
+          {isError && <p className="text-red-500 text-sm">{error.message}</p>}
         </form>
         <div className="flex flex-col w-full gap-2 mt-4">
           <p className="text-white text-sm">{"Don't"} have an account?</p>
