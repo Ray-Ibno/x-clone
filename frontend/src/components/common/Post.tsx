@@ -6,11 +6,7 @@ import { FaTrash } from 'react-icons/fa'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-type User = {
-  username: string
-  profileImg: string
-  fullName: string
-}
+import type { User } from '../../types/user-model'
 
 type Post = {
   post: {
