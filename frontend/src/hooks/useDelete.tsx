@@ -25,6 +25,9 @@ const useDelete = () => {
       toast.success('Post deleted successfully')
       queryClient.invalidateQueries({ queryKey: ['posts'] })
     },
+    onError: () => {
+      toast.error('Something went wrong')
+    },
   })
 }
 

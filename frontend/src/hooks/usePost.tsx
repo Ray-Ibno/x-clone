@@ -1,26 +1,27 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
-type UserData = {
+type RequestDataProp = {
   email?: string
   username?: string
   fullName?: string
   password?: string
+  img?: string | null
+  text?: string
 }
 
-type Route = 'login' | 'signup'
-
-const usePostMutate = (route: Route) => {
+const usePost = (key: string, route: string, toastMessage: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (userData: UserData) => {
+    mutationFn: async (requestData: RequestDataProp) => {
       try {
-        const res = await fetch(`/api/auth/${route}`, {
+        const res = await fetch(route, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(requestData),
         })
 
         const data = await res.json()
@@ -36,9 +37,10 @@ const usePostMutate = (route: Route) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['authUser'] })
+      queryClient.invalidateQueries({ queryKey: [key] })
+      toast.success(toastMessage)
     },
   })
 }
 
-export default usePostMutate
+export default usePost

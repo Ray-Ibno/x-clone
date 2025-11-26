@@ -1,36 +1,62 @@
 import { CiImageOn } from 'react-icons/ci'
 import { BsEmojiSmileFill } from 'react-icons/bs'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
+
 import useGet from '../../hooks/useGet'
+import usePost from '../../hooks/usePost'
 
 const CreatePost = () => {
   const [text, setText] = useState('')
-  const [img, setImg] = useState<string | null>(null)
-
+  const [img, setImg] = useState<string | null | undefined>(null)
+  const [file, setFile] = useState<File | null>(null)
   const imgRef = useRef<HTMLInputElement | null>(null)
 
-  const isPending = false
-  const isError = false
+  const { data: user } = useGet('authUser', '/api/auth/user')
 
-  const { data } = useGet('authUser', '/api/auth/user')
+  useEffect(() => {
+    if (!file) {
+      setImg(null)
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      typeof reader.result === 'string' && setImg(reader.result)
+    }
+    reader.onerror = () => {
+      console.error('Reader error')
+    }
+    reader.readAsDataURL(file)
+
+    return () => {
+      reader.abort()
+    }
+  }, [file])
+
+  const {
+    mutate: createPost,
+    isPending,
+    isError,
+    error,
+  } = usePost('posts', '/api/posts/create', 'Post created succefully')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    alert('Post created successfully')
+    if (isPending) {
+      //Disables submit button while pending
+      return
+    }
+    createPost({ text, img: img === undefined ? null : img })
+    setImg(null)
+    setText('')
   }
 
   const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          typeof reader.result === 'string' && setImg(reader.result)
-        }
-        reader.readAsDataURL(file)
-      }
+    const selectedFile = e.target.files?.[0] || null
+    setFile(selectedFile)
+    if (imgRef.current && imgRef.current.value) {
+      imgRef.current.value = ''
     }
   }
 
@@ -38,7 +64,7 @@ const CreatePost = () => {
     <div className="flex p-4 items-start gap-4 border-b border-gray-700">
       <div className="avatar">
         <div className="w-8 rounded-full">
-          <img src={data.profileImg || '/avatar-placeholder.png'} />
+          <img src={user.profileImg || '/avatar-placeholder.png'} />
         </div>
       </div>
       <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
@@ -85,7 +111,7 @@ const CreatePost = () => {
             {isPending ? 'Posting...' : 'Post'}
           </button>
         </div>
-        {isError && <div className="text-red-500">Something went wrong</div>}
+        {isError && <div className="text-red-500">{error.message}</div>}
       </form>
     </div>
   )

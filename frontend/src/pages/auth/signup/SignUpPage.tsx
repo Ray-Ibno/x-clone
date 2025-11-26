@@ -18,7 +18,11 @@ const SignUpPage = () => {
     passwordRepeat: '',
   })
 
-  const { mutate, isError, isPending, error } = usePost('signup')
+  const { mutate, isError, isPending, error } = usePost(
+    'authUser',
+    '/api/auth/signup',
+    'Signed up successfully'
+  )
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

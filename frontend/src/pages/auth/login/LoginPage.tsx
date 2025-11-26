@@ -14,7 +14,11 @@ type UserLogin = {
 }
 
 const LoginPage = () => {
-  const { mutate, isError, isPending, error } = usePost('login')
+  const { mutate, isError, isPending, error } = usePost(
+    'authUser',
+    '/api/auth/login',
+    'Logged in successfully'
+  )
   const [formData, setFormData] = useState<UserLogin>({
     email: '',
     password: '',

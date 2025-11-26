@@ -7,7 +7,7 @@ const useGet = (key: string, endpoint: string) => {
       try {
         const res = await fetch(endpoint)
         const data = await res.json()
-
+        if (data.error) return null // fix for homepage not redirecting to loginpage when logged out
         if (!res.ok) {
           throw new Error(data.error || 'Something went wrong')
         }
