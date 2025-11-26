@@ -1,20 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
 
-const useGetPosts = (endpoint: string | undefined) => {
+const useGet = (key: string, endpoint: string) => {
   return useQuery({
-    queryKey: ['posts'],
+    queryKey: [key],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/posts/${endpoint}`)
+        const res = await fetch(endpoint)
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Something went wrong')
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Something went wrong')
+        }
 
         return data
       } catch (error) {
         if (error instanceof Error) {
           throw error
         } else {
-          throw Error('An unknown error occured')
+          console.error('An unknown error occured')
         }
       }
     },
@@ -22,4 +25,4 @@ const useGetPosts = (endpoint: string | undefined) => {
   })
 }
 
-export default useGetPosts
+export default useGet

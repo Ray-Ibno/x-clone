@@ -7,11 +7,11 @@ import RightPanel from './components/common/RightPanel'
 import NotificationPage from './pages/notification/NotificationPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import { Toaster } from 'react-hot-toast'
-import useGetUser from './hooks/useGetUser'
+import useGet from './hooks/useGet'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
 function App() {
-  const { data: authUser, isLoading } = useGetUser()
+  const { data: authUser, isLoading } = useGet('authUser', '/api/auth/user')
 
   if (isLoading) {
     return (

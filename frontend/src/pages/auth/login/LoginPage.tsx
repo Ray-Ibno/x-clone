@@ -6,7 +6,7 @@ import XSvg from '../../../components/svgs/X'
 import { MdOutlineMail } from 'react-icons/md'
 import { MdPassword } from 'react-icons/md'
 
-import useMutate from '../../../hooks/useMutate'
+import usePost from '../../../hooks/usePost'
 
 type UserLogin = {
   email: string
@@ -14,7 +14,7 @@ type UserLogin = {
 }
 
 const LoginPage = () => {
-  const { mutate, isError, isPending, error } = useMutate('login')
+  const { mutate, isError, isPending, error } = usePost('login')
   const [formData, setFormData] = useState<UserLogin>({
     email: '',
     password: '',

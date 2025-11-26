@@ -1,6 +1,6 @@
 import Post from './Post'
 import PostSkeleton from '../skeletons/PostSkeleton'
-import useGetPosts from '../../hooks/useGetPosts'
+import useGet from '../../hooks/useGet'
 
 import type { POST } from '../../types/post-model'
 import { useEffect } from 'react'
@@ -13,11 +13,11 @@ const Posts = ({ feedType }: PostProp) => {
   const getPostEndpoint = () => {
     switch (feedType) {
       case 'forYou':
-        return 'all'
+        return '/api/posts/all'
       case 'following':
-        return 'following'
+        return '/api/posts/following'
       default:
-        'all'
+        'api/posts/all'
     }
   }
 
@@ -28,7 +28,7 @@ const Posts = ({ feedType }: PostProp) => {
     isLoading,
     refetch,
     isRefetching,
-  } = useGetPosts(endpoint === undefined ? 'all' : endpoint)
+  } = useGet('posts', endpoint === undefined ? '/api/posts/all' : endpoint)
 
   useEffect(() => {
     refetch()

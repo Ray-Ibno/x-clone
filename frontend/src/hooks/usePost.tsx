@@ -9,7 +9,7 @@ type UserData = {
 
 type Route = 'login' | 'signup'
 
-const useMutate = (route: Route) => {
+const usePostMutate = (route: Route) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -41,4 +41,4 @@ const useMutate = (route: Route) => {
   })
 }
 
-export default useMutate
+export default usePostMutate

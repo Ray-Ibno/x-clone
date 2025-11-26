@@ -6,10 +6,10 @@ import { FaUser } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { BiLogOut } from 'react-icons/bi'
 import useLogout from '../../hooks/useLogout'
-import useGetUser from '../../hooks/useGetUser'
+import useGet from '../../hooks/useGet'
 
 const Sidebar = () => {
-  const { data } = useGetUser()
+  const { data } = useGet('authUser', '/api/auth/user')
 
   const { mutate: logout } = useLogout()
 

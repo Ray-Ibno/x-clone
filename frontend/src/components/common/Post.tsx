@@ -5,36 +5,28 @@ import { FaRegBookmark } from 'react-icons/fa6'
 import { FaTrash } from 'react-icons/fa'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import useGet from '../../hooks/useGet'
 
-import type { User } from '../../types/user-model'
+import type { POST } from '../../types/post-model'
+import useDelete from '../../hooks/useDelete'
+import LoadingSpinner from './LoadingSpinner'
 
-type Post = {
-  post: {
-    _id: string
-    text: string
-    img?: string | undefined
-    user: User
-    comments: {
-      _id: string
-      text: string
-      user: User
-    }[]
-    likes: string[]
-  }
-}
-
-const Post = ({ post }: Post) => {
+const Post = ({ post }: { post: POST }) => {
   const [comment, setComment] = useState('')
-  const postOwner = post.user
-  const isLiked = false
+  const { data: user } = useGet('authUser', '/api/auth/user')
+  const { mutate: deletePost, isPending } = useDelete()
 
-  const isMyPost = true
+  const postOwner = post.user
+
+  const isLiked = false
+  const isMyPost = user._id === post.user._id
+  const isCommenting = false
 
   const formattedDate = '1h'
 
-  const isCommenting = false
-
-  const handleDeletePost = () => {}
+  const handleDeletePost = () => {
+    deletePost(`/api/posts/delete/${post._id}`)
+  }
 
   const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -67,10 +59,13 @@ const Post = ({ post }: Post) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash
-                  className="cursor-pointer hover:text-red-500"
-                  onClick={handleDeletePost}
-                />
+                {!isPending && (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
+                {isPending && <LoadingSpinner size="sm" />}
               </span>
             )}
           </div>

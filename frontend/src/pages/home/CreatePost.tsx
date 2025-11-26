@@ -2,7 +2,7 @@ import { CiImageOn } from 'react-icons/ci'
 import { BsEmojiSmileFill } from 'react-icons/bs'
 import { useRef, useState } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
-import useGetUser from '../../hooks/useGetUser'
+import useGet from '../../hooks/useGet'
 
 const CreatePost = () => {
   const [text, setText] = useState('')
@@ -13,7 +13,7 @@ const CreatePost = () => {
   const isPending = false
   const isError = false
 
-  const { data } = useGetUser()
+  const { data } = useGet('authUser', '/api/auth/user')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -11,10 +11,10 @@ import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
-import useGetUser from '../../hooks/useGetUser'
+import useGet from '../../hooks/useGet'
 
 const ProfilePage = () => {
-  const { data: user, isLoading } = useGetUser()
+  const { data: user, isLoading } = useGet('authUser', '/api/auth/user')
 
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
   const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(
@@ -217,7 +217,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          <Posts />
+          <Posts feedType={feedType} />
         </div>
       </div>
     </>
