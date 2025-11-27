@@ -5,16 +5,19 @@ import Posts from '../../components/common/Posts'
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import EditProfileModal from './EditProfileModal'
 
-import { POSTS } from '../../utils/db/dummy'
-
 import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
+
 import useGet from '../../hooks/useGet'
+import type { POST } from '../../types/post-model'
 
 const ProfilePage = () => {
   const { data: user, isLoading } = useGet('authUser', '/api/auth/user')
+  const { data } = useGet('posts', '/api/posts/all')
+
+  const POSTS = data?.filter((post: POST) => post.user._id === user._id)
 
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
   const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(

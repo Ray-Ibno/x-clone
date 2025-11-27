@@ -15,7 +15,7 @@ type UserLogin = {
 
 const LoginPage = () => {
   const { mutate, isError, isPending, error } = usePost(
-    'authUser',
+    ['authUser'],
     '/api/auth/login',
     'Logged in successfully'
   )

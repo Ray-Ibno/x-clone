@@ -16,6 +16,8 @@ const Posts = ({ feedType }: PostProp) => {
         return '/api/posts/all'
       case 'following':
         return '/api/posts/following'
+      case 'likes':
+        return '/api/postss/liked'
       default:
         'api/posts/all'
     }

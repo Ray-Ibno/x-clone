@@ -3,11 +3,23 @@ import RightPanelSkeleton from '../skeletons/RightPanelSkeleton'
 import useGet from '../../hooks/useGet'
 
 import type { User } from '../../types/user-model'
+import usePost from '../../hooks/usePost'
+import { useState } from 'react'
+import Button from '../ui/Button'
+import LoadingSpinner from './LoadingSpinner'
 
 const RightPanel = () => {
   const { data: suggestedUsers, isLoading } = useGet(
     'suggestedUsers',
     '/api/users/suggested'
+  )
+
+  const [selectedSuggetedUser, setSelectedSuggestedUser] = useState('')
+
+  const { mutate: followUser, isPending } = usePost(
+    ['suggestedUsers', 'authUser'],
+    `/api/users/follow/${selectedSuggetedUser}`,
+    'followed successfully'
   )
 
   if (suggestedUsers?.length < 1) return <div className="md:w-64 w-0"></div>
@@ -20,6 +32,7 @@ const RightPanel = () => {
           {/* item */}
           {isLoading && (
             <>
+              <RightPanelSkeleton />
               <RightPanelSkeleton />
               <RightPanelSkeleton />
               <RightPanelSkeleton />
@@ -49,12 +62,17 @@ const RightPanel = () => {
                   </div>
                 </div>
                 <div>
-                  <button
+                  <Button
                     className="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Follow
-                  </button>
+                    onClick={(
+                      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                    ) => {
+                      e.preventDefault()
+                      setSelectedSuggestedUser(user._id)
+                      followUser({})
+                    }}
+                    label={isPending ? <LoadingSpinner size="sm" /> : 'Follow'}
+                  />
                 </div>
               </Link>
             ))}

@@ -39,7 +39,7 @@ const CreatePost = () => {
     isPending,
     isError,
     error,
-  } = usePost('posts', '/api/posts/create', 'Post created succefully')
+  } = usePost(['posts'], '/api/posts/create', 'Post created succefully')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

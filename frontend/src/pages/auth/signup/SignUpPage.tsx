@@ -19,7 +19,7 @@ const SignUpPage = () => {
   })
 
   const { mutate, isError, isPending, error } = usePost(
-    'authUser',
+    ['authUser'],
     '/api/auth/signup',
     'Signed up successfully'
   )

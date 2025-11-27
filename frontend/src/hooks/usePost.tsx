@@ -10,19 +10,24 @@ type RequestDataProp = {
   text?: string
 }
 
-const usePost = (key: string, route: string, toastMessage: string) => {
+const usePost = (keys: string[], route: string, toastMessage: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (requestData: RequestDataProp) => {
       try {
-        const res = await fetch(route, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        })
+        //conditional operator for the headers and body
+        const res = requestData
+          ? await fetch(route, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestData),
+            })
+          : await fetch(route, {
+              method: 'POST',
+            })
 
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || 'Something went wrong')
@@ -37,7 +42,10 @@ const usePost = (key: string, route: string, toastMessage: string) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [key] })
+      //Promise.all improves speed and performance
+      Promise.all([
+        keys.map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
+      ])
       toast.success(toastMessage)
     },
   })
