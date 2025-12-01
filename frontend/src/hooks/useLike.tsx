@@ -1,17 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { POST } from '../types/post-model'
 import toast from 'react-hot-toast'
 
-const useLogout = () => {
+const useLike = (postId: string) => {
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch('/api/auth/logout', {
+        const res = await fetch(`/api/posts/like/${postId}`, {
           method: 'POST',
         })
-
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || 'Something went wrong')
+        return data
       } catch (error) {
         if (error instanceof Error) {
           throw error
@@ -20,14 +22,16 @@ const useLogout = () => {
         }
       }
     },
-    onSuccess: () => {
-      toast.success('Logged out successfully')
-      queryClient.invalidateQueries({ queryKey: ['authUser'] })
+    onSuccess: (updatedLikes: string[]) => {
+      queryClient.setQueryData(['posts'], (oldData: POST[]) => {
+        return oldData?.map((post) =>
+          post._id === postId ? { ...post, likes: updatedLikes } : post
+        )
+      })
     },
-    onError: () => {
-      toast.error('Logout unsuccessful')
+    onError: (error) => {
+      toast.error(error.message)
     },
   })
 }
-
-export default useLogout
+export default useLike

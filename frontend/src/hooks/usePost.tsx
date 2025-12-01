@@ -10,7 +10,7 @@ type RequestDataProp = {
   text?: string
 }
 
-const usePost = (keys: string[], route: string, toastMessage: string) => {
+const usePost = (keys: string[], route: string, toastMessage?: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -31,7 +31,7 @@ const usePost = (keys: string[], route: string, toastMessage: string) => {
 
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || 'Something went wrong')
-        console.log(data)
+
         return data
       } catch (error) {
         if (error instanceof Error) {
@@ -46,7 +46,7 @@ const usePost = (keys: string[], route: string, toastMessage: string) => {
       Promise.all([
         keys.map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
       ])
-      toast.success(toastMessage)
+      toastMessage && toast.success(toastMessage)
     },
   })
 }

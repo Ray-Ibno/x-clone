@@ -174,22 +174,37 @@ export const likeUnlikePost = async (req, res) => {
     const userId = req.user._id
     const postId = req.params.id
 
-    const post = await Post.findById(postId)
-
-    const isLiked = post.likes.includes(userId)
+    const post = await Post.findById(postId).exec()
 
     if (!post) {
       return res.status(404).json({ error: 'No post found' })
     }
+    const isLiked = post.likes.includes(userId)
 
     if (isLiked) {
       //Unlike
-      await Post.updateOne({ _id: postId }, { $pull: { likes: userId } })
-      await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } })
+      const updatedPost = await Post.findOneAndUpdate(
+        { _id: postId },
+        { $pull: { likes: userId } },
+        { new: true }
+      )
+      await User.findOneAndUpdate(
+        { _id: userId },
+        { $pull: { likedPosts: postId } }
+      )
+
+      res.status(200).json(updatedPost.likes)
     } else {
       //Like
-      await Post.updateOne({ _id: postId }, { $push: { likes: userId } })
-      await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } })
+      const updatedPost = await Post.findOneAndUpdate(
+        { _id: postId },
+        { $push: { likes: userId } },
+        { new: true }
+      )
+      await User.findOneAndUpdate(
+        { _id: userId },
+        { $push: { likedPosts: postId } }
+      )
 
       const notification = new Notification({
         to: post.user,
@@ -198,11 +213,8 @@ export const likeUnlikePost = async (req, res) => {
       })
 
       await notification.save()
+      res.status(200).json(updatedPost.likes)
     }
-
-    res
-      .status(200)
-      .json({ message: `You ${isLiked ? 'unliked' : 'liked'} a post` })
   } catch (error) {
     console.log('Error at likePost controller', error.message)
     res.status(500).json({ error: 'Internal server error' })

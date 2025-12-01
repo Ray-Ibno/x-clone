@@ -10,16 +10,18 @@ import useGet from '../../hooks/useGet'
 import type { POST } from '../../types/post-model'
 import useDelete from '../../hooks/useDelete'
 import LoadingSpinner from './LoadingSpinner'
+import useLike from '../../hooks/useLike'
 
 const Post = ({ post }: { post: POST }) => {
   const [comment, setComment] = useState('')
   const { data: user } = useGet('authUser', '/api/auth/user')
-  const { mutate: deletePost, isPending } = useDelete()
+  const { mutate: likePost, isPending: isLiking } = useLike(post._id)
+  const { mutate: deletePost, isPending: isDeleting } = useDelete()
 
   const postOwner = post.user
 
-  const isLiked = false
-  const isMyPost = user._id === post.user._id
+  const isLiked = post.likes.includes(user._id)
+  const isMyPost = postOwner._id === user._id
   const isCommenting = false
 
   const formattedDate = '1h'
@@ -32,7 +34,10 @@ const Post = ({ post }: { post: POST }) => {
     e.preventDefault()
   }
 
-  const handleLikePost = () => {}
+  const handleLikePost = () => {
+    if (isLiking) return //prevents handleLikePost from running while isliking is true
+    likePost()
+  }
 
   return (
     <>
@@ -59,13 +64,13 @@ const Post = ({ post }: { post: POST }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                {!isPending && (
+                {!isDeleting && (
                   <FaTrash
                     className="cursor-pointer hover:text-red-500"
                     onClick={handleDeletePost}
                   />
                 )}
-                {isPending && <LoadingSpinner size="sm" />}
+                {isDeleting && <LoadingSpinner size="sm" />}
               </span>
             )}
           </div>
@@ -145,11 +150,7 @@ const Post = ({ post }: { post: POST }) => {
                       onChange={(e) => setComment(e.target.value)}
                     />
                     <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isCommenting ? (
-                        <span className="loading loading-spinner loading-md"></span>
-                      ) : (
-                        'Post'
-                      )}
+                      {isCommenting ? <LoadingSpinner size="md" /> : 'Post'}
                     </button>
                   </form>
                 </div>
@@ -175,8 +176,8 @@ const Post = ({ post }: { post: POST }) => {
                 )}
 
                 <span
-                  className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-                    isLiked ? 'text-pink-500' : ''
+                  className={`text-sm group-hover:text-pink-500 ${
+                    isLiked ? 'text-pink-500' : ' text-slate-500'
                   }`}
                 >
                   {post.likes.length}

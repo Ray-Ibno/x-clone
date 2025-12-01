@@ -10,6 +10,8 @@ type PostProp = {
 }
 
 const Posts = ({ feedType }: PostProp) => {
+  const { data: authUser } = useGet('authuser', '/api/auth/user')
+
   const getPostEndpoint = () => {
     switch (feedType) {
       case 'forYou':
@@ -17,7 +19,7 @@ const Posts = ({ feedType }: PostProp) => {
       case 'following':
         return '/api/posts/following'
       case 'likes':
-        return '/api/postss/liked'
+        return `/api/posts/liked/${authUser._id}`
       default:
         'api/posts/all'
     }
@@ -30,7 +32,7 @@ const Posts = ({ feedType }: PostProp) => {
     isLoading,
     refetch,
     isRefetching,
-  } = useGet('posts', endpoint === undefined ? '/api/posts/all' : endpoint)
+  } = useGet('posts', !endpoint ? '/api/posts/all' : endpoint)
 
   useEffect(() => {
     refetch()
