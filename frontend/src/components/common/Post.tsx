@@ -12,20 +12,26 @@ import type { POST } from '../../types/post-model'
 import useDelete from '../../hooks/useDelete'
 import useLike from '../../hooks/useLike'
 import useGetUser from '../../hooks/useGetUser'
+import useCreateComment from '../../hooks/useCreateComment'
+import { formatPostDate } from '../../utils/date'
 
 const Post = ({ post }: { post: POST }) => {
   const [comment, setComment] = useState('')
   const { data: user } = useGetUser()
   const { mutate: likePost, isPending: isLiking } = useLike(post._id)
   const { mutate: deletePost, isPending: isDeleting } = useDelete(post._id)
+  const { mutate: postComment, isPending: isCommenting } = useCreateComment(
+    post._id,
+    comment,
+    () => setComment('')
+  )
 
   const postOwner = post.user
 
   const isLiked = post.likes.includes(user._id)
   const isMyPost = postOwner._id === user._id
-  const isCommenting = false
 
-  const formattedDate = '1h'
+  const formattedDate = formatPostDate(post.createdAt)
 
   const handleDeletePost = () => {
     deletePost()
@@ -33,6 +39,8 @@ const Post = ({ post }: { post: POST }) => {
 
   const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (isCommenting) return //prevents handlePostCommetn from running while isCommenting is true
+    postComment()
   }
 
   const handleLikePost = () => {

@@ -149,20 +149,24 @@ export const commentOnPost = async (req, res) => {
     if (!text) {
       return res
         .status(400)
-        .json({ error: 'Please input text on the text field' })
+        .json({ message: 'Please input text on the text field' })
     }
-
-    const post = await Post.findById(id)
 
     const comment = {
       text,
       user: userId,
     }
 
-    post.comments.push(comment)
-    await post.save()
+    const updatedPost = await Post.findOneAndUpdate(
+      { _id: id },
+      { $push: { comments: comment } },
+      { new: true }
+    ).populate([
+      { path: 'user', select: '-password' },
+      { path: 'comments', populate: { path: 'user', select: '-password' } },
+    ])
 
-    res.status(200).json(post)
+    res.status(200).json(updatedPost.comments)
   } catch (error) {
     console.log('Error at commentOnPost controller', error.message)
     res.status(500).json({ message: 'Internal server error' })
