@@ -1,26 +1,20 @@
 import { Link } from 'react-router-dom'
-import RightPanelSkeleton from '../skeletons/RightPanelSkeleton'
-import useGet from '../../hooks/useGet'
-
-import type { User } from '../../types/user-model'
-import usePost from '../../hooks/usePost'
 import { useState } from 'react'
 import Button from '../ui/Button'
+import RightPanelSkeleton from '../skeletons/RightPanelSkeleton'
+
 import LoadingSpinner from './LoadingSpinner'
+import type { User } from '../../types/user-model'
+
+import useFollow from '../../hooks/useFollow'
+import useGetSuggestedUsers from '../../hooks/useGetSuggested'
 
 const RightPanel = () => {
-  const { data: suggestedUsers, isLoading } = useGet(
-    'suggestedUsers',
-    '/api/users/suggested'
-  )
+  const { data: suggestedUsers, isLoading } = useGetSuggestedUsers()
 
   const [selectedSuggetedUser, setSelectedSuggestedUser] = useState('')
 
-  const { mutate: followUser, isPending } = usePost(
-    ['suggestedUsers', 'authUser'],
-    `/api/users/follow/${selectedSuggetedUser}`,
-    'followed successfully'
-  )
+  const { mutate: followUser, isPending } = useFollow(selectedSuggetedUser)
 
   if (suggestedUsers?.length < 1) return <div className="md:w-64 w-0"></div>
 
@@ -69,7 +63,7 @@ const RightPanel = () => {
                     ) => {
                       e.preventDefault()
                       setSelectedSuggestedUser(user._id)
-                      followUser({})
+                      followUser()
                     }}
                     label={isPending ? <LoadingSpinner size="sm" /> : 'Follow'}
                   />

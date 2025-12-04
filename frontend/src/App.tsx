@@ -1,17 +1,21 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+
 import SignUpPage from './pages/auth/signup/SignUpPage'
 import LoginPage from './pages/auth/login/LoginPage'
 import HomePage from './pages/home/HomePage'
-import Sidebar from './components/common/Sidebar'
-import RightPanel from './components/common/RightPanel'
 import NotificationPage from './pages/notification/NotificationPage'
 import ProfilePage from './pages/profile/ProfilePage'
+
+import Sidebar from './components/common/Sidebar'
+import RightPanel from './components/common/RightPanel'
+
 import { Toaster } from 'react-hot-toast'
-import useGet from './hooks/useGet'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
+import useGetUser from './hooks/useGetUser'
+
 function App() {
-  const { data: authUser, isLoading } = useGet('authUser', '/api/auth/user')
+  const { data: authUser, isLoading } = useGetUser()
 
   if (isLoading) {
     return (

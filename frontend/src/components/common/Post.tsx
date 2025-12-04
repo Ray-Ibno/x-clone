@@ -5,18 +5,19 @@ import { FaRegBookmark } from 'react-icons/fa6'
 import { FaTrash } from 'react-icons/fa'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import useGet from '../../hooks/useGet'
 
-import type { POST } from '../../types/post-model'
-import useDelete from '../../hooks/useDelete'
 import LoadingSpinner from './LoadingSpinner'
+import type { POST } from '../../types/post-model'
+
+import useDelete from '../../hooks/useDelete'
 import useLike from '../../hooks/useLike'
+import useGetUser from '../../hooks/useGetUser'
 
 const Post = ({ post }: { post: POST }) => {
   const [comment, setComment] = useState('')
-  const { data: user } = useGet('authUser', '/api/auth/user')
+  const { data: user } = useGetUser()
   const { mutate: likePost, isPending: isLiking } = useLike(post._id)
-  const { mutate: deletePost, isPending: isDeleting } = useDelete()
+  const { mutate: deletePost, isPending: isDeleting } = useDelete(post._id)
 
   const postOwner = post.user
 
@@ -27,7 +28,7 @@ const Post = ({ post }: { post: POST }) => {
   const formattedDate = '1h'
 
   const handleDeletePost = () => {
-    deletePost(`/api/posts/delete/${post._id}`)
+    deletePost()
   }
 
   const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {

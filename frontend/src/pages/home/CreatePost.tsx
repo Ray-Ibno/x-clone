@@ -3,8 +3,8 @@ import { BsEmojiSmileFill } from 'react-icons/bs'
 import { useEffect, useRef, useState } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
 
-import useGet from '../../hooks/useGet'
-import usePost from '../../hooks/usePost'
+import useGetUser from '../../hooks/useGetUser'
+import useCreatePost from '../../hooks/useCreatePost'
 
 const CreatePost = () => {
   const [text, setText] = useState('')
@@ -12,7 +12,7 @@ const CreatePost = () => {
   const [file, setFile] = useState<File | null>(null)
   const imgRef = useRef<HTMLInputElement | null>(null)
 
-  const { data: user } = useGet('authUser', '/api/auth/user')
+  const { data: user } = useGetUser()
 
   useEffect(() => {
     if (!file) {
@@ -34,12 +34,7 @@ const CreatePost = () => {
     }
   }, [file])
 
-  const {
-    mutate: createPost,
-    isPending,
-    isError,
-    error,
-  } = usePost(['posts'], '/api/posts/create', 'Post created succefully')
+  const { mutate: createPost, isPending, isError, error } = useCreatePost()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

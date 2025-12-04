@@ -10,12 +10,14 @@ import { IoCalendarOutline } from 'react-icons/io5'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
 
-import useGet from '../../hooks/useGet'
 import type { POST } from '../../types/post-model'
 
+import useGetUser from '../../hooks/useGetUser'
+import useGetPosts from '../../hooks/useGetPosts'
+
 const ProfilePage = () => {
-  const { data: user, isLoading } = useGet('authUser', '/api/auth/user')
-  const { data } = useGet('posts', '/api/posts/all')
+  const { data: user, isLoading } = useGetUser()
+  const { data } = useGetPosts()
 
   const POSTS = data?.filter((post: POST) => post.user._id === user._id)
 

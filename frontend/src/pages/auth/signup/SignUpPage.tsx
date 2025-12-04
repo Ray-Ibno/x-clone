@@ -7,7 +7,8 @@ import { MdOutlineMail } from 'react-icons/md'
 import { FaUser } from 'react-icons/fa'
 import { MdPassword } from 'react-icons/md'
 import { MdDriveFileRenameOutline } from 'react-icons/md'
-import usePost from '../../../hooks/usePost'
+
+import useSignUp from '../../../hooks/useSignup'
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -18,15 +19,11 @@ const SignUpPage = () => {
     passwordRepeat: '',
   })
 
-  const { mutate, isError, isPending, error } = usePost(
-    ['authUser'],
-    '/api/auth/signup',
-    'Signed up successfully'
-  )
+  const { mutate: signup, isError, isPending, error } = useSignUp(formData)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    mutate(formData)
+    signup()
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -13,7 +13,7 @@ export const getNotifications = async (req, res) => {
     res.status(200).json(notifications)
   } catch (error) {
     console.log('Error at getNotification controller', error.message)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ message: 'Internal server error' })
   }
 }
 
@@ -25,6 +25,6 @@ export const deleteNotification = async (req, res) => {
     res.status(200).json({ message: 'Notifications deleted successfully' })
   } catch (error) {
     console.log('Error at deleteNotification controller', error.message)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ message: 'Internal server error' })
   }
 }

@@ -1,38 +1,25 @@
 import Post from './Post'
 import PostSkeleton from '../skeletons/PostSkeleton'
-import useGet from '../../hooks/useGet'
+import { useEffect } from 'react'
 
 import type { POST } from '../../types/post-model'
-import { useEffect } from 'react'
+
+import useGetUser from '../../hooks/useGetUser'
+import useGetPosts from '../../hooks/useGetPosts'
 
 type PostProp = {
   feedType: string
 }
 
 const Posts = ({ feedType }: PostProp) => {
-  const { data: authUser } = useGet('authuser', '/api/auth/user')
-
-  const getPostEndpoint = () => {
-    switch (feedType) {
-      case 'forYou':
-        return '/api/posts/all'
-      case 'following':
-        return '/api/posts/following'
-      case 'likes':
-        return `/api/posts/liked/${authUser._id}`
-      default:
-        'api/posts/all'
-    }
-  }
-
-  const endpoint = getPostEndpoint()
+  const { data: authUser } = useGetUser()
 
   const {
     data: POSTS,
     isLoading,
     refetch,
     isRefetching,
-  } = useGet('posts', !endpoint ? '/api/posts/all' : endpoint)
+  } = useGetPosts(feedType, authUser._id)
 
   useEffect(() => {
     refetch()
