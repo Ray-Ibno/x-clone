@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import useFetchApi from './useFetchApi'
+import type { POST } from '../types/post-model'
 
 const useGetPosts = (feedType?: string, userId?: string) => {
   const getPostEndpoint = () => {
@@ -20,17 +22,7 @@ const useGetPosts = (feedType?: string, userId?: string) => {
     queryKey: ['posts'],
     queryFn: async () => {
       try {
-        const res = await fetch(endpoint)
-        if (!res.ok) {
-          const errorData = await res.json()
-          throw new Error(
-            `HTTP error! Status: ${res.status}, Message: ${
-              errorData.message || res.statusText
-            }`
-          )
-        }
-        const data = await res.json()
-        return data
+        return useFetchApi<POST[]>(endpoint)
       } catch (error) {
         if (error instanceof Error) {
           console.error('Fetching Error: ', error.message)

@@ -1,24 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import useFetchApi from './useFetchApi'
+
+interface ApiResponse {
+  status: 'success' | 'error'
+  message: string
+  data?: {
+    message: string
+  }
+}
 
 const useFollow = (id: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch(`/api/users/follow/${id}`, {
+        return useFetchApi<ApiResponse>(`/api/users/follow/${id}`, {
           method: 'POST',
         })
-        if (!res.ok) {
-          const errorData = await res.json()
-          throw new Error(
-            `HTTP error! Status: ${res.status}, Message: ${
-              errorData.message || res.statusText
-            }`
-          )
-        }
-        const data = await res.json()
-        return data
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
@@ -27,12 +26,15 @@ const useFollow = (id: string) => {
         }
       }
     },
-    onSuccess: ({ message }) => {
+    onSuccess: (data) => {
       Promise.all([
         ['authUser', 'suggestedUsers'].map((key) =>
           queryClient.invalidateQueries({ queryKey: [key] })
         ),
       ])
+
+      const message = data ? data.message : ''
+
       toast.success(message)
     },
   })

@@ -10,7 +10,7 @@ const useFetchApi = async <T>(
   }
 
   const data = await res.json()
-  return data
+  return data as Promise<T>
 }
 
 export default useFetchApi

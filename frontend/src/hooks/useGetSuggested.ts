@@ -1,22 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
+import useFetchApi from './useFetchApi'
+import type { User } from '../types/user-model'
 
 const useGetSuggestedUsers = () => {
   return useQuery({
     queryKey: ['suggestedUsers'],
     queryFn: async () => {
       try {
-        const res = await fetch('/api/users/suggested')
-        if (!res.ok) {
-          const errorData = await res.json()
-          throw new Error(
-            `HTTP error! Status: ${res.status}, Message: ${
-              errorData.message || res.statusText
-            }`
-          )
-        }
-
-        const data = await res.json()
-        return data
+        return useFetchApi<User[]>('/api/users/suggested')
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
