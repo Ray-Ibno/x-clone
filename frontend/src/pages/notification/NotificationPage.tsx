@@ -4,32 +4,18 @@ import LoadingSpinner from '../../components/common/LoadingSpinner'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { FaUser } from 'react-icons/fa'
 import { FaHeart } from 'react-icons/fa6'
+import useGetNotifications from '../../hooks/useGetNotifications'
+import useDeleteNotification from '../../hooks/useDeleteNotification'
+import useGetUser from '../../hooks/useGetUser'
 
 const NotificationPage = () => {
-  const isLoading = false
-  const notifications = [
-    {
-      _id: '1',
-      from: {
-        _id: '1',
-        username: 'johndoe',
-        profileImg: '/avatars/boy2.png',
-      },
-      type: 'follow',
-    },
-    {
-      _id: '2',
-      from: {
-        _id: '2',
-        username: 'janedoe',
-        profileImg: '/avatars/girl1.png',
-      },
-      type: 'like',
-    },
-  ]
+  const { data: authUser } = useGetUser()
+  const { data: notifications, isLoading } = useGetNotifications()
+  const { mutate: deleteAll, isPending: isDeleting } = useDeleteNotification()
 
   const deleteNotifications = () => {
-    alert('All notifications deleted')
+    if (isDeleting) return
+    deleteAll()
   }
 
   return (
@@ -81,11 +67,22 @@ const NotificationPage = () => {
                 </div>
                 <div className="flex gap-1">
                   <span className="font-bold">
-                    @{notification.from.username}
+                    @
+                    {notification.from.username === authUser.username
+                      ? 'You'
+                      : notification.from.username}
                   </span>{' '}
                   {notification.type === 'follow'
-                    ? 'followed you'
-                    : 'liked your post'}
+                    ? `followed ${
+                        notification.from.username === authUser.username
+                          ? 'yourself'
+                          : 'you'
+                      }`
+                    : `liked your ${
+                        notification.from.username === authUser.username
+                          ? 'own'
+                          : ''
+                      } post`}
                 </div>
               </Link>
             </div>

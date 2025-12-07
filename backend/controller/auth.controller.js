@@ -77,8 +77,12 @@ export const login = async (req, res) => {
       user?.password || ''
     )
 
-    if (!user || !isPasswordMatched) {
-      return res.status(400).json({ message: 'invalid email or password' })
+    if (!user) {
+      return res.status(400).json({ message: 'invalid email' })
+    }
+
+    if (!isPasswordMatched) {
+      return res.status(400).json({ message: 'invalid password' })
     }
 
     generateTokenAndSetCookie(user.id, res)
