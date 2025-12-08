@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import SignUpPage from './pages/auth/signup/SignUpPage'
 import LoginPage from './pages/auth/login/LoginPage'
@@ -13,6 +14,7 @@ import { Toaster } from 'react-hot-toast'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
 import useGetUser from './hooks/useGetUser'
+import ErrorFallback from './components/ErrorFallback'
 
 function App() {
   const { data: authUser, isLoading } = useGetUser()
@@ -26,33 +28,37 @@ function App() {
   }
 
   return (
-    <div className="flex max-w-6xl mx-auto font-display">
-      {authUser && <Sidebar />}
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to={'/login'} />}
-        />
-        <Route
-          path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to={'/'} />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to={'/'} />}
-        />
-        <Route
-          path="/notifications"
-          element={authUser ? <NotificationPage /> : <Navigate to={'/login'} />}
-        />
-        <Route
-          path="/profile/:username"
-          element={authUser ? <ProfilePage /> : <Navigate to={'/login'} />}
-        />
-      </Routes>
-      {authUser && <RightPanel />}
-      <Toaster />
-    </div>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <div className="flex max-w-6xl mx-auto font-display">
+        {authUser && <Sidebar />}
+        <Routes>
+          <Route
+            path="/"
+            element={authUser ? <HomePage /> : <Navigate to={'/login'} />}
+          />
+          <Route
+            path="/login"
+            element={!authUser ? <LoginPage /> : <Navigate to={'/'} />}
+          />
+          <Route
+            path="/signup"
+            element={!authUser ? <SignUpPage /> : <Navigate to={'/'} />}
+          />
+          <Route
+            path="/notifications"
+            element={
+              authUser ? <NotificationPage /> : <Navigate to={'/login'} />
+            }
+          />
+          <Route
+            path="/profile/:username"
+            element={authUser ? <ProfilePage /> : <Navigate to={'/login'} />}
+          />
+        </Routes>
+        {authUser && <RightPanel />}
+        <Toaster />
+      </div>
+    </ErrorBoundary>
   )
 }
 
