@@ -15,10 +15,10 @@ import useGetUser from '../../hooks/useGetUser'
 import useCreateComment from '../../hooks/useCreateComment'
 import { formatPostDate } from '../../utils/date'
 
-const Post = ({ post }: { post: POST }) => {
+const Post = ({ post, feedType }: { post: POST; feedType: string }) => {
   const [comment, setComment] = useState('')
-  const { data: user } = useGetUser()
-  const { mutate: likePost, isPending: isLiking } = useLike(post._id)
+  const { data: authUser } = useGetUser()
+  const { mutate: likePost, isPending: isLiking } = useLike(post._id, feedType)
   const { mutate: deletePost, isPending: isDeleting } = useDelete(post._id)
   const { mutate: postComment, isPending: isCommenting } = useCreateComment(
     post._id,
@@ -28,8 +28,8 @@ const Post = ({ post }: { post: POST }) => {
 
   const postOwner = post.user
 
-  const isLiked = post.likes.includes(user._id)
-  const isMyPost = postOwner._id === user._id
+  const isLiked = post.likes.includes(authUser._id)
+  const isMyPost = postOwner._id === authUser._id
 
   const formattedDate = formatPostDate(post.createdAt)
 

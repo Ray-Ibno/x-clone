@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { POST } from '../types/post-model'
 import toast from 'react-hot-toast'
 import useFetchApi from './useFetchApi'
+import { useParams } from 'react-router-dom'
 
-const useLike = (postId: string) => {
+const useLike = (postId: string, feedType: string) => {
   const queryClient = useQueryClient()
+  const { username } = useParams()
 
   return useMutation({
     mutationFn: async () => {
@@ -24,11 +26,14 @@ const useLike = (postId: string) => {
       if (!updatedLikes) {
         return console.log('no updated likes received in useLike hook')
       }
-      queryClient.setQueryData(['posts'], (oldData: POST[]) => {
-        return oldData?.map((post) =>
-          post._id === postId ? { ...post, likes: updatedLikes } : post
-        )
-      })
+      queryClient.setQueryData(
+        ['posts', feedType, username],
+        (oldData: POST[]) => {
+          return oldData?.map((post) =>
+            post._id === postId ? { ...post, likes: updatedLikes } : post
+          )
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message)

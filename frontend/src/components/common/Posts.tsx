@@ -1,10 +1,8 @@
 import Post from './Post'
 import PostSkeleton from '../skeletons/PostSkeleton'
-import { useEffect } from 'react'
 
 import type { POST } from '../../types/post-model'
 
-import useGetUser from '../../hooks/useGetUser'
 import useGetPosts from '../../hooks/useGetPosts'
 
 type PostProp = {
@@ -12,18 +10,7 @@ type PostProp = {
 }
 
 const Posts = ({ feedType }: PostProp) => {
-  const { data: authUser } = useGetUser()
-
-  const {
-    data: POSTS,
-    isLoading,
-    refetch,
-    isRefetching,
-  } = useGetPosts(feedType, authUser._id)
-
-  useEffect(() => {
-    refetch()
-  }, [feedType])
+  const { data: POSTS, isLoading, isRefetching } = useGetPosts(feedType)
 
   return (
     <>
@@ -40,7 +27,7 @@ const Posts = ({ feedType }: PostProp) => {
       {!isLoading && !isRefetching && POSTS && (
         <div>
           {POSTS.map((post: POST) => (
-            <Post key={post._id} post={post} />
+            <Post key={post._id} post={post} feedType={feedType} />
           ))}
         </div>
       )}

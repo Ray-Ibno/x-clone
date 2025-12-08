@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import useFetchApi from './useFetchApi'
 import type { POST } from '../types/post-model'
+import { useParams } from 'react-router-dom'
 
-const useGetPosts = (feedType?: string, userId?: string) => {
+const useGetPosts = (feedType?: string) => {
+  const { username } = useParams()
   const getPostEndpoint = () => {
     switch (feedType) {
       case 'forYou':
@@ -10,7 +12,9 @@ const useGetPosts = (feedType?: string, userId?: string) => {
       case 'following':
         return '/api/posts/following'
       case 'likes':
-        return `/api/posts/liked/${userId}`
+        return `/api/posts/liked/${username}`
+      case 'posts':
+        return `/api/posts/user/${username}`
       default:
         return 'api/posts/all'
     }
@@ -19,7 +23,7 @@ const useGetPosts = (feedType?: string, userId?: string) => {
   const endpoint = getPostEndpoint()
 
   return useQuery({
-    queryKey: ['posts'],
+    queryKey: ['posts', feedType, username],
     queryFn: async () => {
       try {
         return useFetchApi<POST[]>(endpoint)

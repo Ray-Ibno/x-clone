@@ -14,9 +14,9 @@ import { authenticateUser } from '../middleware/authorizeUser.js'
 const router = express.Router()
 
 router.get('/all', authenticateUser, getAllPosts)
-router.get('/liked/:id', authenticateUser, getLikedPosts)
+router.get('/liked/:username', authenticateUser, getLikedPosts)
 router.get('/following', authenticateUser, getFollowingPosts)
-router.get('/user/:id', authenticateUser, getUserPosts)
+router.get('/user/:username', authenticateUser, getUserPosts)
 router.post('/create', authenticateUser, createPost)
 router.post('/like/:id', authenticateUser, likeUnlikePost)
 router.delete('/delete/:id', authenticateUser, deletePost)

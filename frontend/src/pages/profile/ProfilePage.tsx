@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import Posts from '../../components/common/Posts'
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
@@ -12,14 +12,18 @@ import { MdEdit } from 'react-icons/md'
 
 import type { POST } from '../../types/post-model'
 
-import useGetUser from '../../hooks/useGetUser'
 import useGetPosts from '../../hooks/useGetPosts'
+import useGetUserProfile from '../../hooks/useGetUserProfile'
+import { formatMemberSinceDate } from '../../utils/date'
 
 const ProfilePage = () => {
-  const { data: user, isLoading } = useGetUser()
-  const { data } = useGetPosts()
+  const { username } = useParams()
 
-  const POSTS = data?.filter((post: POST) => post.user._id === user._id)
+  const { data: user, isLoading, isRefetching } = useGetUserProfile(username)
+  const { data: post } = useGetPosts()
+  const memberSinceDate = user ? formatMemberSinceDate(user.createdAt) : ''
+
+  const POSTS = post?.filter((post: POST) => post.user._id === user?._id)
 
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
   const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(
@@ -54,12 +58,12 @@ const ProfilePage = () => {
     <>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
         {/* HEADER */}
-        {isLoading && <ProfileHeaderSkeleton />}
-        {!isLoading && !user && (
+        {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+        {!isLoading && !isRefetching && !user && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
         <div className="flex flex-col">
-          {!isLoading && user && (
+          {!isLoading && !isRefetching && user && (
             <>
               <div className="flex gap-10 px-4 py-2 items-center">
                 <Link to="/">
@@ -180,7 +184,7 @@ const ProfilePage = () => {
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
                     <span className="text-sm text-slate-500">
-                      Joined July 2021
+                      {memberSinceDate}
                     </span>
                   </div>
                 </div>
@@ -201,7 +205,9 @@ const ProfilePage = () => {
               </div>
               <div className="flex w-full border-b border-gray-700 mt-4">
                 <div
-                  className="flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer"
+                  className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer ${
+                    feedType === 'posts' ? '' : 'text-slate-500'
+                  }`}
                   onClick={() => setFeedType('posts')}
                 >
                   Posts
@@ -210,7 +216,9 @@ const ProfilePage = () => {
                   )}
                 </div>
                 <div
-                  className="flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer"
+                  className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer ${
+                    feedType === 'likes' ? '' : 'text-slate-500'
+                  }`}
                   onClick={() => setFeedType('likes')}
                 >
                   Likes
