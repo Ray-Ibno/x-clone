@@ -3,10 +3,13 @@ import type { POST } from '../types/post-model'
 import toast from 'react-hot-toast'
 import useFetchApi from './useFetchApi'
 import { useParams } from 'react-router-dom'
+import { useContext } from 'react'
+import { feedTypeContext } from '../context/feedTypeContext'
 
-const useLike = (postId: string, feedType: string) => {
+const useLike = (postId: string) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
+  const feedType = useContext(feedTypeContext)
 
   return useMutation({
     mutationFn: async () => {

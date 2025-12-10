@@ -3,15 +3,18 @@ import useFetchApi from './useFetchApi'
 import toast from 'react-hot-toast'
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
+import { useContext } from 'react'
+import { feedTypeContext } from '../context/feedTypeContext'
 
 const useCreateComment = (
   postId: string,
   text: string,
-  success: () => void,
-  feedType?: string
+  success: () => void
 ) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
+  const feedType = useContext(feedTypeContext)
+
   return useMutation({
     mutationFn: async () => {
       try {

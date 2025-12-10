@@ -12,13 +12,16 @@ import { MdEdit } from 'react-icons/md'
 
 import type { POST } from '../../types/post-model'
 
+import { feedTypeContext } from '../../context/feedTypeContext'
+
 import useGetPosts from '../../hooks/useGetPosts'
 import useGetUserProfile from '../../hooks/useGetUserProfile'
-import { formatMemberSinceDate } from '../../utils/date'
 import useGetUser from '../../hooks/useGetUser'
-import Button from '../../components/ui/Button'
 import useFollow from '../../hooks/useFollow'
 import useUpdateProfile from '../../hooks/useUpdateProfile'
+
+import { formatMemberSinceDate } from '../../utils/date'
+import Button from '../../components/ui/Button'
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
@@ -80,7 +83,8 @@ const ProfilePage = () => {
   }
 
   return (
-    <>
+    //feedType context is being used refetching query key
+    <feedTypeContext.Provider value={feedType}>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
@@ -264,7 +268,7 @@ const ProfilePage = () => {
           {!isLoading && !isRefetching && <Posts feedType={feedType} />}
         </div>
       </div>
-    </>
+    </feedTypeContext.Provider>
   )
 }
 export default ProfilePage

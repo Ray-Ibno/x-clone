@@ -2,9 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import useFetchApi from './useFetchApi'
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
+import { useContext } from 'react'
+import { feedTypeContext } from '../context/feedTypeContext'
 
-const useGetPosts = (feedType?: string) => {
+const useGetPosts = () => {
   const { username } = useParams()
+  const feedType = useContext(feedTypeContext)
   const getPostEndpoint = () => {
     switch (feedType) {
       case 'forYou':
