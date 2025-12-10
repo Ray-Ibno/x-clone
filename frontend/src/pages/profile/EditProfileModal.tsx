@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useUpdateProfile from '../../hooks/useUpdateProfile'
 
 const EditProfileModal = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ const EditProfileModal = () => {
     newPassword: '',
     currentPassword: '',
   })
+
+  const { mutate: updateProfile, isPending: isUpdating } =
+    useUpdateProfile(formData)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -37,7 +41,8 @@ const EditProfileModal = () => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault()
-              alert('Profile updated successfully')
+              if (isUpdating) return
+              updateProfile()
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -102,7 +107,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+              {isUpdating ? 'Updating...' : 'Update'}
             </button>
           </form>
         </div>

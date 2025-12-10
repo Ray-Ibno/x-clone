@@ -10,7 +10,7 @@ interface ApiResponse {
   }
 }
 
-const useFollow = (id: string) => {
+const useFollow = (id: string | undefined) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {

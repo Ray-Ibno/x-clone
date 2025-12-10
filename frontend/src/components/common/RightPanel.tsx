@@ -16,7 +16,8 @@ const RightPanel = () => {
 
   const { mutate: followUser, isPending } = useFollow(selectedSuggetedUser)
 
-  if (suggestedUsers?.length < 1) return <div className="md:w-64 w-0"></div>
+  if (suggestedUsers && suggestedUsers.length < 1)
+    return <div className="md:w-64 w-0"></div>
 
   return (
     <div className="hidden lg:block my-4 mx-2">

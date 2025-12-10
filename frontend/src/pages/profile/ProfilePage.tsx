@@ -15,26 +15,44 @@ import type { POST } from '../../types/post-model'
 import useGetPosts from '../../hooks/useGetPosts'
 import useGetUserProfile from '../../hooks/useGetUserProfile'
 import { formatMemberSinceDate } from '../../utils/date'
+import useGetUser from '../../hooks/useGetUser'
+import Button from '../../components/ui/Button'
+import useFollow from '../../hooks/useFollow'
+import useUpdateProfile from '../../hooks/useUpdateProfile'
 
 const ProfilePage = () => {
-  const { username } = useParams()
-
-  const { data: user, isLoading, isRefetching } = useGetUserProfile(username)
-  const { data: post } = useGetPosts()
-  const memberSinceDate = user ? formatMemberSinceDate(user.createdAt) : ''
-
-  const POSTS = post?.filter((post: POST) => post.user._id === user?._id)
-
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
   const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(
     null
   )
   const [feedType, setFeedType] = useState('posts')
-
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 
-  const isMyProfile = true
+  const { data: authUser } = useGetUser()
+  const { username } = useParams()
+
+  const {
+    data: userProfile,
+    isLoading,
+    isRefetching,
+  } = useGetUserProfile(username)
+  const { data: post } = useGetPosts()
+
+  const { mutate: follow, isPending } = useFollow(userProfile?._id)
+  const { mutate: updateImage, isPending: isUpdating } = useUpdateProfile({
+    coverImg,
+    profileImg,
+  })
+
+  const memberSinceDate = userProfile
+    ? formatMemberSinceDate(userProfile.createdAt)
+    : ''
+
+  const POSTS = post?.filter((post: POST) => post.user._id === userProfile?._id)
+
+  const isMyProfile = authUser?._id === userProfile?._id
+  const isUserFollowedByMe = authUser.following.includes(userProfile?._id)
 
   const handleImgChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -54,23 +72,30 @@ const ProfilePage = () => {
     }
   }
 
+  const getButtonLabel = () => {
+    if (isPending && isUserFollowedByMe) return 'Unfollowing...'
+    if (isPending && !isUserFollowedByMe) return 'Following...'
+    if (!isPending && isUserFollowedByMe) return 'Unfollow'
+    if (!isPending && !isUserFollowedByMe) return 'Follow'
+  }
+
   return (
     <>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
-        {!isLoading && !isRefetching && !user && (
+        {!isLoading && !isRefetching && !userProfile && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
         <div className="flex flex-col">
-          {!isLoading && !isRefetching && user && (
+          {!isLoading && !isRefetching && userProfile && (
             <>
               <div className="flex gap-10 px-4 py-2 items-center">
                 <Link to="/">
                   <FaArrowLeft className="w-4 h-4" />
                 </Link>
                 <div className="flex flex-col">
-                  <p className="font-bold text-lg">{user?.fullName}</p>
+                  <p className="font-bold text-lg">{userProfile?.fullName}</p>
                   <span className="text-sm text-slate-500">
                     {POSTS?.length} posts
                   </span>
@@ -81,7 +106,7 @@ const ProfilePage = () => {
                 <img
                   src={
                     (typeof coverImg === 'string' && coverImg) ||
-                    user?.coverImg ||
+                    userProfile?.coverImg ||
                     '/cover.png'
                   }
                   className="h-52 w-full object-cover"
@@ -118,7 +143,7 @@ const ProfilePage = () => {
                     <img
                       src={
                         (typeof profileImg === 'string' && profileImg) ||
-                        user?.profileImg ||
+                        userProfile?.profileImg ||
                         '/avatar-placeholder.png'
                       }
                     />
@@ -139,34 +164,40 @@ const ProfilePage = () => {
               <div className="flex justify-end px-4 mt-5">
                 {isMyProfile && <EditProfileModal />}
                 {!isMyProfile && (
-                  <button
+                  <Button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => alert('Followed successfully')}
-                  >
-                    Follow
-                  </button>
+                    onClick={() => {
+                      if (isPending) return
+                      follow()
+                    }}
+                    label={`${getButtonLabel()}`}
+                  />
                 )}
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => alert('Profile updated successfully')}
+                    onClick={() => {
+                      updateImage()
+                    }}
                   >
-                    Update
+                    {isUpdating ? 'Updating...' : 'Update'}
                   </button>
                 )}
               </div>
 
               <div className="flex flex-col gap-4 mt-14 px-4">
                 <div className="flex flex-col">
-                  <span className="font-bold text-lg">{user?.fullName}</span>
-                  <span className="text-sm text-slate-500">
-                    @{user?.username}
+                  <span className="font-bold text-lg">
+                    {userProfile?.fullName}
                   </span>
-                  <span className="text-sm my-1">{user?.bio}</span>
+                  <span className="text-sm text-slate-500">
+                    @{userProfile?.username}
+                  </span>
+                  <span className="text-sm my-1">{userProfile?.bio}</span>
                 </div>
 
                 <div className="flex gap-2 flex-wrap">
-                  {user?.link && (
+                  {userProfile?.link && (
                     <div className="flex gap-1 items-center ">
                       <>
                         <FaLink className="w-3 h-3 text-slate-500" />
@@ -191,13 +222,13 @@ const ProfilePage = () => {
                 <div className="flex gap-2">
                   <div className="flex gap-1 items-center">
                     <span className="font-bold text-xs">
-                      {user?.following.length}
+                      {userProfile?.following.length}
                     </span>
                     <span className="text-slate-500 text-xs">Following</span>
                   </div>
                   <div className="flex gap-1 items-center">
                     <span className="font-bold text-xs">
-                      {user?.followers.length}
+                      {userProfile?.followers.length}
                     </span>
                     <span className="text-slate-500 text-xs">Followers</span>
                   </div>
@@ -230,7 +261,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          <Posts feedType={feedType} />
+          {!isLoading && !isRefetching && <Posts feedType={feedType} />}
         </div>
       </div>
     </>

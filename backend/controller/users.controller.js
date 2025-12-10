@@ -121,7 +121,7 @@ export const updateUserProfile = async (req, res) => {
 
       if (!isPasswordStrong) {
         return res.status(400).json({
-          error:
+          message:
             'Password needs atleast one number, one lowercase letter and one uppercase letter',
         })
       }
@@ -132,9 +132,18 @@ export const updateUserProfile = async (req, res) => {
       user.password = hashedPassword
     }
 
+    if (email) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      const isEmailValid = emailRegex.test(email)
+      if (!isEmailValid)
+        return res.status(400).json({ message: 'email is not in valid format' })
+    }
+
     if (profileImg) {
       if (user.profileImg) {
-        await cloudinary.destroy(user.profileImg.split('/').pop().split('.')[0])
+        await cloudinary.uploader.destroy(
+          user.profileImg.split('/').pop().split('.')[0]
+        )
       }
       const response = await cloudinary.uploader.upload(profileImg)
       profileImg = response.secure_url
@@ -142,9 +151,11 @@ export const updateUserProfile = async (req, res) => {
 
     if (coverImg) {
       if (user.coverImg) {
-        await cloudinary.destroy(user / coverImg.split('/').pop().split('.')[0])
+        await cloudinary.uploader.destroy(
+          user.coverImg.split('/').pop().split('.')[0]
+        )
       }
-      const coverImg = await cloudinary.uploader.upload(coverImg)
+      const response = await cloudinary.uploader.upload(coverImg)
       coverImg = response.secure_url
     }
 

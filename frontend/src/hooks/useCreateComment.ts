@@ -2,14 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import useFetchApi from './useFetchApi'
 import toast from 'react-hot-toast'
 import type { POST } from '../types/post-model'
+import { useParams } from 'react-router-dom'
 
 const useCreateComment = (
   postId: string,
   text: string,
-  success: () => void
+  success: () => void,
+  feedType?: string
 ) => {
   const queryClient = useQueryClient()
-
+  const { username } = useParams()
   return useMutation({
     mutationFn: async () => {
       try {
@@ -30,11 +32,14 @@ const useCreateComment = (
     },
     onSuccess: (updatedComments: POST['comments'] | undefined) => {
       toast.success('Comment added')
-      queryClient.setQueryData(['posts'], (oldData: POST[]) => {
-        return oldData.map((post) =>
-          post._id === postId ? { ...post, comments: updatedComments } : post
-        )
-      })
+      queryClient.setQueryData(
+        ['posts', feedType, username],
+        (oldData: POST[]) => {
+          return oldData.map((post) =>
+            post._id === postId ? { ...post, comments: updatedComments } : post
+          )
+        }
+      )
       success()
     },
     onError: (error) => {

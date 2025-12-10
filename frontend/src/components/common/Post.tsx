@@ -23,7 +23,8 @@ const Post = ({ post, feedType }: { post: POST; feedType: string }) => {
   const { mutate: postComment, isPending: isCommenting } = useCreateComment(
     post._id,
     comment,
-    () => setComment('')
+    () => setComment(''),
+    feedType
   )
 
   const postOwner = post.user
