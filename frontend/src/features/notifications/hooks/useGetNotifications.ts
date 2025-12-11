@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import useFetchApi from './useFetchApi'
+import useFetchApi from '../../../hooks/useFetchApi'
 
 type Notification = {
   _id: string

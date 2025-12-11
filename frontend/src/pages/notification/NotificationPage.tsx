@@ -4,9 +4,10 @@ import LoadingSpinner from '../../components/common/LoadingSpinner'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { FaUser } from 'react-icons/fa'
 import { FaHeart } from 'react-icons/fa6'
-import useGetNotifications from '../../hooks/useGetNotifications'
-import useDeleteNotification from '../../hooks/useDeleteNotification'
+
 import useGetUser from '../../hooks/useGetUser'
+import useGetNotifications from '../../features/notifications/hooks/useGetNotifications'
+import useDeleteNotification from '../../features/notifications/hooks/useDeleteNotification'
 
 const NotificationPage = () => {
   const { data: authUser } = useGetUser()

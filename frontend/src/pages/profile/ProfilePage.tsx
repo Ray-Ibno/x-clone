@@ -15,10 +15,10 @@ import type { POST } from '../../types/post-model'
 import { feedTypeContext } from '../../context/feedTypeContext'
 
 import useGetPosts from '../../hooks/useGetPosts'
-import useGetUserProfile from '../../hooks/useGetUserProfile'
 import useGetUser from '../../hooks/useGetUser'
 import useFollow from '../../hooks/useFollow'
-import useUpdateProfile from '../../hooks/useUpdateProfile'
+import useUpdateProfile from '../../features/profile/hooks/useUpdateProfile'
+import useGetUserProfile from '../../features/profile/hooks/useGetUserProfile'
 
 import { formatMemberSinceDate } from '../../utils/date'
 import Button from '../../components/ui/Button'

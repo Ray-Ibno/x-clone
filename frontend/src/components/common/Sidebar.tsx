@@ -5,7 +5,8 @@ import { FaUser } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { BiLogOut } from 'react-icons/bi'
 
-import useLogout from '../../hooks/useLogout'
+import useLogout from '../../features/auth/hooks/useLogout'
+
 import useGetUser from '../../hooks/useGetUser'
 
 const Sidebar = () => {

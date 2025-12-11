@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import useFetchApi from './useFetchApi'
+
 import toast from 'react-hot-toast'
+import useFetchApi from '../../../hooks/useFetchApi'
 
 type RequestData = {
   email: string

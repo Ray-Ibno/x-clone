@@ -8,7 +8,7 @@ import { FaUser } from 'react-icons/fa'
 import { MdPassword } from 'react-icons/md'
 import { MdDriveFileRenameOutline } from 'react-icons/md'
 
-import useSignUp from '../../../hooks/useSignup'
+import useSignUp from '../../../features/auth/hooks/useSignup'
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
