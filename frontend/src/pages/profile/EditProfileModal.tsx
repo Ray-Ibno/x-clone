@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useUpdateProfile from '../../hooks/useUpdateProfile'
+import useGetUser from '../../hooks/useGetUser'
+import { useNavigate } from 'react-router-dom'
 
 const EditProfileModal = () => {
+  const { data: authUser } = useGetUser()
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -12,14 +15,34 @@ const EditProfileModal = () => {
     currentPassword: '',
   })
 
-  const { mutate: updateProfile, isPending: isUpdating } =
-    useUpdateProfile(formData)
+  const {
+    mutate: updateProfile,
+    isPending: isUpdating,
+    isSuccess,
+  } = useUpdateProfile(formData)
+
+  const navigate = useNavigate()
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
+
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        username: authUser.username,
+        email: authUser.email,
+        bio: authUser.bio,
+        link: authUser.link,
+        newPassword: '',
+        currentPassword: '',
+      })
+    }
+    navigate(`/profile/${authUser.username}`)
+  }, [isSuccess])
 
   return (
     <>
