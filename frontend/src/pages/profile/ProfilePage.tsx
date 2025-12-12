@@ -1,20 +1,16 @@
-import { useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import Posts from '../../components/common/Posts'
+import UserProfileTopBar from '../../features/profile/components/userProfileTopBar'
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import EditProfileModal from './EditProfileModal'
 
-import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
 import { FaLink } from 'react-icons/fa'
-import { MdEdit } from 'react-icons/md'
-
-import type { POST } from '../../types/post-model'
 
 import { feedTypeContext } from '../../context/feedTypeContext'
 
-import useGetPosts from '../../hooks/useGetPosts'
 import useGetUser from '../../hooks/useGetUser'
 import useFollow from '../../hooks/useFollow'
 import useUpdateProfile from '../../features/profile/hooks/useUpdateProfile'
@@ -22,6 +18,7 @@ import useGetUserProfile from '../../features/profile/hooks/useGetUserProfile'
 
 import { formatMemberSinceDate } from '../../utils/date'
 import Button from '../../components/ui/Button'
+import UserProfileImages from '../../features/profile/components/UserProfileImages'
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
@@ -29,8 +26,6 @@ const ProfilePage = () => {
     null
   )
   const [feedType, setFeedType] = useState('posts')
-  const coverImgRef = useRef<HTMLInputElement | null>(null)
-  const profileImgRef = useRef<HTMLInputElement | null>(null)
 
   const { data: authUser } = useGetUser()
   const { username } = useParams()
@@ -40,8 +35,6 @@ const ProfilePage = () => {
     isLoading,
     isRefetching,
   } = useGetUserProfile(username)
-
-  const { data: post } = useGetPosts()
 
   const { mutate: follow, isPending } = useFollow(userProfile?._id)
   const { mutate: updateImage, isPending: isUpdating } = useUpdateProfile({
@@ -53,28 +46,8 @@ const ProfilePage = () => {
     ? formatMemberSinceDate(userProfile.createdAt)
     : ''
 
-  const POSTS = post?.filter((post: POST) => post.user._id === userProfile?._id)
-
   const isMyProfile = authUser?._id === userProfile?._id
   const isUserFollowedByMe = authUser.following.includes(userProfile?._id)
-
-  const handleImgChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    state: string
-  ) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          state === 'coverImg' && setCoverImg(reader.result)
-          state === 'profileImg' && setProfileImg(reader.result)
-        }
-        reader.readAsDataURL(file)
-      }
-    }
-  }
 
   const getButtonLabel = () => {
     if (isPending && isUserFollowedByMe) return 'Unfollowing...'
@@ -95,77 +68,15 @@ const ProfilePage = () => {
         <div className="flex flex-col">
           {!isLoading && !isRefetching && userProfile && (
             <>
-              <div className="flex gap-10 px-4 py-2 items-center">
-                <Link to="/">
-                  <FaArrowLeft className="w-4 h-4" />
-                </Link>
-                <div className="flex flex-col">
-                  <p className="font-bold text-lg">{userProfile?.fullName}</p>
-                  <span className="text-sm text-slate-500">
-                    {POSTS?.length} posts
-                  </span>
-                </div>
-              </div>
-              {/* COVER IMG */}
-              <div className="relative group/cover">
-                <img
-                  src={
-                    (typeof coverImg === 'string' && coverImg) ||
-                    userProfile?.coverImg ||
-                    '/cover.png'
-                  }
-                  className="h-52 w-full object-cover"
-                  alt="cover image"
-                />
-                {isMyProfile && (
-                  <div
-                    className="absolute top-2 right-2 rounded-full p-2 bg-gray-800 bg-opacity-75 cursor-pointer opacity-0 group-hover/cover:opacity-100 transition duration-200"
-                    onClick={() =>
-                      coverImgRef.current && coverImgRef.current.click()
-                    }
-                  >
-                    <MdEdit className="w-5 h-5 text-white" />
-                  </div>
-                )}
+              <UserProfileTopBar userProfile={userProfile} />
+              <UserProfileImages
+                userProfile={userProfile}
+                isMyProfile={isMyProfile}
+                imgs={{ coverImg, profileImg }}
+                setCoverImg={setCoverImg}
+                setProfileImg={setProfileImg}
+              />
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  ref={coverImgRef}
-                  onChange={(e) => handleImgChange(e, 'coverImg')}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  ref={profileImgRef}
-                  onChange={(e) => handleImgChange(e, 'profileImg')}
-                />
-                {/* USER AVATAR */}
-                <div className="avatar absolute -bottom-16 left-4">
-                  <div className="w-32 rounded-full relative group/avatar">
-                    <img
-                      src={
-                        (typeof profileImg === 'string' && profileImg) ||
-                        userProfile?.profileImg ||
-                        '/avatar-placeholder.png'
-                      }
-                    />
-                    <div className="absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer">
-                      {isMyProfile && (
-                        <MdEdit
-                          className="w-4 h-4 text-white"
-                          onClick={() =>
-                            profileImgRef.current &&
-                            profileImgRef.current.click()
-                          }
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div className="flex justify-end px-4 mt-5">
                 {isMyProfile && <EditProfileModal />}
                 {!isMyProfile && (
