@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import Posts from '../../components/common/Posts'
-import UserProfileTopBar from '../../features/profile/components/userProfileTopBar'
+
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import EditProfileModal from './EditProfileModal'
 
@@ -19,6 +19,7 @@ import useGetUserProfile from '../../features/profile/hooks/useGetUserProfile'
 import { formatMemberSinceDate } from '../../utils/date'
 import Button from '../../components/ui/Button'
 import UserProfileImages from '../../features/profile/components/UserProfileImages'
+import UserProfileTopBar from '../../features/profile/components/UserProfileTopBar'
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
