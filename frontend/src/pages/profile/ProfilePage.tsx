@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import Posts from '../../components/common/Posts'
@@ -55,6 +55,13 @@ const ProfilePage = () => {
     if (!isPending && isUserFollowedByMe) return 'Unfollow'
     if (!isPending && !isUserFollowedByMe) return 'Follow'
   }
+
+  useEffect(() => {
+    //resets the feedType when profile page is visited
+    if (username) {
+      setFeedType('posts')
+    }
+  }, [username])
 
   return (
     //feedType context is being used refetching query key
