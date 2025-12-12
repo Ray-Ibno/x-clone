@@ -37,7 +37,7 @@ const ProfilePage = () => {
   } = useGetUserProfile(username)
 
   const { mutate: follow, isPending } = useFollow(userProfile?._id)
-  const { mutate: updateImage, isPending: isUpdating } = useUpdateProfile({
+  const { mutateAsync: updateImage, isPending: isUpdating } = useUpdateProfile({
     coverImg,
     profileImg,
   })
@@ -92,8 +92,10 @@ const ProfilePage = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => {
-                      updateImage()
+                    onClick={async () => {
+                      await updateImage()
+                      setCoverImg(null)
+                      setProfileImg(null)
                     }}
                   >
                     {isUpdating ? 'Updating...' : 'Update'}
