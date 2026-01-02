@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 import type { User } from '../types/user-model'
 
 const useGetSuggestedUsers = () => {
@@ -7,7 +7,7 @@ const useGetSuggestedUsers = () => {
     queryKey: ['suggestedUsers'],
     queryFn: async () => {
       try {
-        return useFetchApi<User[]>('/api/users/suggested')
+        return fetchData<User[]>('/api/users/suggested')
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

@@ -1,16 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 import toast from 'react-hot-toast'
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
 
-const useCreateComment = (
-  postId: string,
-  text: string,
-  success: () => void
-) => {
+const useCreateComment = (postId: string, text: string, success: () => void) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
@@ -18,7 +14,7 @@ const useCreateComment = (
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi<POST['comments']>(`/api/posts/comment/${postId}`, {
+        return fetchData<POST['comments']>(`/api/posts/comment/${postId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -35,14 +31,11 @@ const useCreateComment = (
     },
     onSuccess: (updatedComments: POST['comments'] | undefined) => {
       toast.success('Comment added')
-      queryClient.setQueryData(
-        ['posts', feedType, username],
-        (oldData: POST[]) => {
-          return oldData.map((post) =>
-            post._id === postId ? { ...post, comments: updatedComments } : post
-          )
-        }
-      )
+      queryClient.setQueryData(['posts', feedType, username], (oldData: POST[]) => {
+        return oldData.map((post) =>
+          post._id === postId ? { ...post, comments: updatedComments } : post
+        )
+      })
       success()
     },
     onError: (error) => {

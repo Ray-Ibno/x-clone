@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 import type { POST } from '../types/post-model'
 
 type PostData = {
@@ -15,7 +15,7 @@ const useCreatePost = () => {
   return useMutation({
     mutationFn: async (postData: PostData) => {
       try {
-        return useFetchApi<POST>('/api/posts/create', {
+        return fetchData<POST>('/api/posts/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

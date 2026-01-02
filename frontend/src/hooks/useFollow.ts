@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 
 interface ApiResponse {
   status: 'success' | 'error'
@@ -15,7 +15,7 @@ const useFollow = (id: string | undefined) => {
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi<ApiResponse>(`/api/users/follow/${id}`, {
+        return fetchData<ApiResponse>(`/api/users/follow/${id}`, {
           method: 'POST',
         })
       } catch (error) {

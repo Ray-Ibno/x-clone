@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 
 type requestData = {
   email: string
@@ -13,7 +13,7 @@ const useLogin = (requestData: requestData) => {
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi('/api/auth/login', {
+        return fetchData('/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

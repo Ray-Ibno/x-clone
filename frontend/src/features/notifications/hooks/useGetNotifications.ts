@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 
 type Notification = {
   _id: string
@@ -16,7 +16,7 @@ const useGetNotifications = () => {
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
-        return useFetchApi<Notification>('/api/notifications')
+        return fetchData<Notification>('/api/notifications')
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

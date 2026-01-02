@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import toast from 'react-hot-toast'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 
 type UpdateData = {
   username?: string
@@ -18,7 +18,7 @@ const useUpdateProfile = (updateData: UpdateData) => {
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi<UpdateData>('/api/users/update', {
+        return fetchData<UpdateData>('/api/users/update', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

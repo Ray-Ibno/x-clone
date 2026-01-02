@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 import type { User } from '../../../types/user-model'
 
 const useGetUserProfile = (username?: string) => {
@@ -7,7 +7,7 @@ const useGetUserProfile = (username?: string) => {
     queryKey: ['userProfile', username],
     queryFn: async () => {
       try {
-        return useFetchApi<User>(`/api/users/profile/${username}`)
+        return fetchData<User>(`/api/users/profile/${username}`)
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

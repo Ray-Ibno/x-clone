@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
@@ -29,7 +29,7 @@ const useGetPosts = () => {
     queryKey: ['posts', feedType, username],
     queryFn: async () => {
       try {
-        return useFetchApi<POST[]>(endpoint)
+        return fetchData<POST[]>(endpoint)
       } catch (error) {
         if (error instanceof Error) {
           console.error('Fetching Error: ', error.message)

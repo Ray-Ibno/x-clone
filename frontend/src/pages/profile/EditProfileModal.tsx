@@ -16,17 +16,11 @@ const EditProfileModal = () => {
     currentPassword: '',
   })
 
-  const {
-    mutate: updateProfile,
-    isPending: isUpdating,
-    isSuccess,
-  } = useUpdateProfile(formData)
+  const { mutate: updateProfile, isPending: isUpdating, isSuccess } = useUpdateProfile(formData)
 
   const navigate = useNavigate()
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
@@ -50,10 +44,10 @@ const EditProfileModal = () => {
       <button
         className="btn btn-outline rounded-full btn-sm"
         onClick={() => {
-          const modal = document.getElementById(
-            'edit_profile_modal'
-          ) as HTMLDialogElement
-          modal && modal.showModal()
+          const modal = document.getElementById('edit_profile_modal') as HTMLDialogElement
+          if (modal) {
+            modal.showModal()
+          }
         }}
       >
         Edit profile

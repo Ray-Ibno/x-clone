@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import toast from 'react-hot-toast'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 
 const useDeleteNotification = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi('/api/notifications', {
+        return fetchData('/api/notifications', {
           method: 'DELETE',
         })
       } catch (error) {

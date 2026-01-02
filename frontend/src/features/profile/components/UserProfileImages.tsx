@@ -23,18 +23,19 @@ const UserProfileImages = ({
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 
-  const handleImgChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    state: string
-  ) => {
+  const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: string) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
 
       if (file) {
         const reader = new FileReader()
         reader.onload = () => {
-          state === 'coverImg' && setCoverImg(reader.result)
-          state === 'profileImg' && setProfileImg(reader.result)
+          if (state === 'coverImg') {
+            setCoverImg(reader.result)
+          }
+          if (state === 'profileImg') {
+            setProfileImg(reader.result)
+          }
         }
         reader.readAsDataURL(file)
       }
@@ -89,9 +90,7 @@ const UserProfileImages = ({
             {isMyProfile && (
               <MdEdit
                 className="w-4 h-4 text-white"
-                onClick={() =>
-                  profileImgRef.current && profileImgRef.current.click()
-                }
+                onClick={() => profileImgRef.current && profileImgRef.current.click()}
               />
             )}
           </div>

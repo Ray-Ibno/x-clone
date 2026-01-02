@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import useFetchApi from './useFetchApi'
+import fetchData from '../utils/api/fetchData'
 
 const useDelete = (postId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi(`/api/posts/delete/${postId}`, {
+        return fetchData(`/api/posts/delete/${postId}`, {
           method: 'DELETE',
         })
       } catch (error) {

@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import useFetchApi from '../../../hooks/useFetchApi'
+import fetchData from '../../../utils/api/fetchData'
 
 const useLogout = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        return useFetchApi('/api/auth/logout', {
+        return fetchData('/api/auth/logout', {
           method: 'POST',
         })
       } catch (error) {
