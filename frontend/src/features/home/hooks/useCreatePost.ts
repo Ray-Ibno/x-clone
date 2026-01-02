@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import fetchData from '../utils/api/fetchData'
-import type { POST } from '../types/post-model'
+import fetchData from '../../.././utils/api/fetchData'
+import type { POST } from '../../../types/post-model'
 
 type PostData = {
   text: string

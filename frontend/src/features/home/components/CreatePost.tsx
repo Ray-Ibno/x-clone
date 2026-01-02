@@ -3,8 +3,8 @@ import { BsEmojiSmileFill } from 'react-icons/bs'
 import { useEffect, useRef, useState } from 'react'
 import { IoCloseSharp } from 'react-icons/io5'
 
-import useGetUser from '../../hooks/useGetUser'
-import useCreatePost from '../../hooks/useCreatePost'
+import useGetUser from '../../../hooks/useGetUser'
+import useCreatePost from '../hooks/useCreatePost'
 
 const CreatePost = () => {
   const [text, setText] = useState('')

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
-import Posts from '../../components/common/Posts'
-import CreatePost from './CreatePost'
-
 import { feedTypeContext } from '../../context/feedTypeContext'
+
+import Posts from '../../components/common/Posts'
+import { CreatePost } from '../../features/home'
 
 const HomePage = () => {
   const [feedType, setFeedType] = useState<string>('forYou')

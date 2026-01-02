@@ -6,7 +6,7 @@ import XSvg from '../../../components/svgs/X'
 import { MdOutlineMail } from 'react-icons/md'
 import { MdPassword } from 'react-icons/md'
 
-import useLogin from '../../../features/auth/hooks/useLogin'
+import { useLogin } from '../../../features/auth'
 
 type UserLogin = {
   email: string

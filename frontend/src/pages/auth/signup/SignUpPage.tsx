@@ -8,7 +8,7 @@ import { FaUser } from 'react-icons/fa'
 import { MdPassword } from 'react-icons/md'
 import { MdDriveFileRenameOutline } from 'react-icons/md'
 
-import useSignUp from '../../../features/auth/hooks/useSignup'
+import { useSignup } from '../../../features/auth'
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,7 @@ const SignUpPage = () => {
     passwordRepeat: '',
   })
 
-  const { mutate: signup, isError, isPending, error } = useSignUp(formData)
+  const { mutate: signup, isError, isPending, error } = useSignup(formData)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -74,10 +74,7 @@ const SignUpPage = () => {
         <XSvg className=" lg:w-2/3 fill-white" />
       </div>
       <div className="flex-1 flex flex-col justify-center items-center">
-        <form
-          className="w-full mx-auto md:mx-20 flex gap-4 flex-col"
-          onSubmit={handleSubmit}
-        >
+        <form className="w-full mx-auto md:mx-20 flex gap-4 flex-col" onSubmit={handleSubmit}>
           <XSvg className="w-24 lg:hidden fill-white" />
           <h1 className="text-4xl font-extrabold text-white">Join today.</h1>
           {inputElementDetails.map((input) => (

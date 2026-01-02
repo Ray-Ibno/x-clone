@@ -13,29 +13,26 @@ import { feedTypeContext } from '../../context/feedTypeContext'
 
 import useGetUser from '../../hooks/useGetUser'
 import useFollow from '../../hooks/useFollow'
-import useUpdateProfile from '../../features/profile/hooks/useUpdateProfile'
-import useGetUserProfile from '../../features/profile/hooks/useGetUserProfile'
 
 import { formatMemberSinceDate } from '../../utils/date'
 import Button from '../../components/ui/Button'
-import UserProfileImages from '../../features/profile/components/UserProfileImages'
-import UserProfileTopBar from '../../features/profile/components/UserProfileTopBar'
+
+import {
+  UserProfileImages,
+  UserProfileTopBar,
+  useUpdateProfile,
+  useGetUserProfile,
+} from '../../features/profile'
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
-  const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(
-    null
-  )
+  const [profileImg, setProfileImg] = useState<string | ArrayBuffer | null>(null)
   const [feedType, setFeedType] = useState('posts')
 
   const { data: authUser } = useGetUser()
   const { username } = useParams()
 
-  const {
-    data: userProfile,
-    isLoading,
-    isRefetching,
-  } = useGetUserProfile(username)
+  const { data: userProfile, isLoading, isRefetching } = useGetUserProfile(username)
 
   const { mutate: follow, isPending } = useFollow(userProfile?._id)
   const { mutateAsync: updateImage, isPending: isUpdating } = useUpdateProfile({
@@ -43,9 +40,7 @@ const ProfilePage = () => {
     profileImg,
   })
 
-  const memberSinceDate = userProfile
-    ? formatMemberSinceDate(userProfile.createdAt)
-    : ''
+  const memberSinceDate = userProfile ? formatMemberSinceDate(userProfile.createdAt) : ''
 
   const isMyProfile = authUser?._id === userProfile?._id
   const isUserFollowedByMe = authUser.following.includes(userProfile?._id)
@@ -113,12 +108,8 @@ const ProfilePage = () => {
 
               <div className="flex flex-col gap-4 mt-14 px-4">
                 <div className="flex flex-col">
-                  <span className="font-bold text-lg">
-                    {userProfile?.fullName}
-                  </span>
-                  <span className="text-sm text-slate-500">
-                    @{userProfile?.username}
-                  </span>
+                  <span className="font-bold text-lg">{userProfile?.fullName}</span>
+                  <span className="text-sm text-slate-500">@{userProfile?.username}</span>
                   <span className="text-sm my-1">{userProfile?.bio}</span>
                 </div>
 
@@ -140,22 +131,16 @@ const ProfilePage = () => {
                   )}
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
-                    <span className="text-sm text-slate-500">
-                      {memberSinceDate}
-                    </span>
+                    <span className="text-sm text-slate-500">{memberSinceDate}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <div className="flex gap-1 items-center">
-                    <span className="font-bold text-xs">
-                      {userProfile?.following.length}
-                    </span>
+                    <span className="font-bold text-xs">{userProfile?.following.length}</span>
                     <span className="text-slate-500 text-xs">Following</span>
                   </div>
                   <div className="flex gap-1 items-center">
-                    <span className="font-bold text-xs">
-                      {userProfile?.followers.length}
-                    </span>
+                    <span className="font-bold text-xs">{userProfile?.followers.length}</span>
                     <span className="text-slate-500 text-xs">Followers</span>
                   </div>
                 </div>

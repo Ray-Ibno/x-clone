@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import useGetUser from '../../hooks/useGetUser'
 import { useNavigate } from 'react-router-dom'
-import useUpdateProfile from '../../features/profile/hooks/useUpdateProfile'
+import { useUpdateProfile } from '../../features/profile'
 
 const EditProfileModal = () => {
   const { data: authUser } = useGetUser()
