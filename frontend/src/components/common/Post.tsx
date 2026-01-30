@@ -22,8 +22,8 @@ const Post = ({ post }: { post: POST }) => {
 
   const postOwner = post.user
 
-  const isLiked = post.likes.includes(authUser._id)
-  const isMyPost = postOwner._id === authUser._id
+  const isLiked = authUser && post.likes.includes(authUser._id)
+  const isMyPost = postOwner._id === authUser?._id
 
   const formattedDate = formatPostDate(post.createdAt)
 
@@ -40,10 +40,7 @@ const Post = ({ post }: { post: POST }) => {
     <>
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
         <div className="avatar">
-          <Link
-            to={`/profile/${postOwner.username}`}
-            className="w-8 rounded-full overflow-hidden"
-          >
+          <Link to={`/profile/${postOwner.username}`} className="w-8 rounded-full overflow-hidden">
             <img src={postOwner.profileImg || '/avatar-placeholder.png'} />
           </Link>
         </div>
@@ -53,9 +50,7 @@ const Post = ({ post }: { post: POST }) => {
               {postOwner.fullName}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
-              <Link to={`/profile/${postOwner.username}`}>
-                @{postOwner.username}
-              </Link>
+              <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
               <span>·</span>
               <span>{formattedDate}</span>
             </span>
@@ -87,7 +82,7 @@ const Post = ({ post }: { post: POST }) => {
                 className="flex gap-1 items-center cursor-pointer group"
                 onClick={() => {
                   const comment_Modal = document.getElementById(
-                    'comments_modal' + post._id
+                    'comments_modal' + post._id,
                   ) as HTMLDialogElement
                   comment_Modal.showModal()
                 }}
@@ -101,9 +96,7 @@ const Post = ({ post }: { post: POST }) => {
               <CommentDialog post={post} />
               <div className="flex gap-1 items-center group cursor-pointer">
                 <BiRepost className="w-6 h-6  text-slate-500 group-hover:text-green-500" />
-                <span className="text-sm text-slate-500 group-hover:text-green-500">
-                  0
-                </span>
+                <span className="text-sm text-slate-500 group-hover:text-green-500">0</span>
               </div>
               <div
                 className="flex gap-1 items-center group cursor-pointer"
@@ -112,9 +105,7 @@ const Post = ({ post }: { post: POST }) => {
                 {!isLiked && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
-                {isLiked && (
-                  <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
-                )}
+                {isLiked && <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />}
 
                 <span
                   className={`text-sm group-hover:text-pink-500 ${
