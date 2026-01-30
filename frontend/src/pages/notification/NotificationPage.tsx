@@ -60,16 +60,16 @@ const NotificationPage = () => {
                 <div className="flex gap-1">
                   <span className="font-bold">
                     @
-                    {notification.from.username === authUser.username
+                    {notification.from.username === authUser?.username
                       ? 'You'
                       : notification.from.username}
                   </span>{' '}
                   {notification.type === 'follow'
                     ? `followed ${
-                        notification.from.username === authUser.username ? 'yourself' : 'you'
+                        notification.from.username === authUser?.username ? 'yourself' : 'you'
                       }`
                     : `liked your ${
-                        notification.from.username === authUser.username ? 'own' : ''
+                        notification.from.username === authUser?.username ? 'own' : ''
                       } post`}
                 </div>
               </Link>
