@@ -7,7 +7,7 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: ['https://x-clone-5xkt.onrender.com/', 'http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true,
   },

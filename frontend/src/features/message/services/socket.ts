@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client'
 import { useChatStore } from '../store/useChatStore'
 
-const BASE_URL = 'http://localhost:5100'
+const BASE_URL = import.meta.env.VITE_SOCKET_URL
 
 export const socket = io(BASE_URL, {
   autoConnect: false,
