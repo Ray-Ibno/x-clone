@@ -4,6 +4,7 @@ import fetchData from '../../../utils/api/fetchData'
 
 const useLogout = () => {
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {

@@ -8,8 +8,10 @@ import authRoute from './routes/auth.route.js'
 import userRoute from './routes/user.route.js'
 import postRoute from './routes/post.route.js'
 import notificationRoute from './routes/notification.route.js'
+import messageRoute from './routes/message.route.js'
 
 import dbConnect from './db/dbConnect.js'
+import { app, io, server } from './listeners/socket.js'
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -17,7 +19,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET,
 })
 
-const app = express()
 const PORT = process.env.PORT || 5200
 
 const __dirname = path.resolve()
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoute)
 app.use('/api/users', userRoute)
 app.use('/api/posts', postRoute)
 app.use('/api/notifications', notificationRoute)
+app.use('/api/messages', messageRoute)
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '/frontend/dist')))
@@ -38,7 +40,7 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   dbConnect()
   console.log(`listening to port ${PORT}`)
 })

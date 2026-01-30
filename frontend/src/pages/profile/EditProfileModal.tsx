@@ -36,8 +36,8 @@ const EditProfileModal = () => {
         currentPassword: '',
       })
     }
-    navigate(`/profile/${authUser.username}`)
-  }, [isSuccess])
+    navigate(`/profile/${authUser?.username}`)
+  }, [isSuccess, authUser, navigate])
 
   return (
     <>

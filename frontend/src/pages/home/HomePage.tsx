@@ -40,7 +40,7 @@ const HomePage = () => {
         <CreatePost />
 
         {/* POSTS */}
-        <Posts feedType={feedType} />
+        <Posts />
       </div>
     </feedTypeContext.Provider>
   )

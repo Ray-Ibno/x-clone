@@ -5,17 +5,11 @@ import type { POST } from '../../types/post-model'
 
 import useGetPosts from '../../hooks/useGetPosts'
 
-import { feedTypeContext } from '../../context/feedTypeContext'
-
-type PostProp = {
-  feedType: string
-}
-
-const Posts = ({ feedType }: PostProp) => {
+const Posts = () => {
   const { data: POSTS, isLoading, isRefetching } = useGetPosts()
 
   return (
-    <feedTypeContext.Provider value={feedType}>
+    <>
       {(isLoading || isRefetching) && (
         <div className="flex flex-col justify-center">
           <PostSkeleton />
@@ -33,7 +27,7 @@ const Posts = ({ feedType }: PostProp) => {
           ))}
         </div>
       )}
-    </feedTypeContext.Provider>
+    </>
   )
 }
 export default Posts

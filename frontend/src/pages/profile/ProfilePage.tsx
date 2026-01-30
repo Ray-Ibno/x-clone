@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import Posts from '../../components/common/Posts'
 
@@ -23,6 +23,7 @@ import {
   useUpdateProfile,
   useGetUserProfile,
 } from '../../features/profile'
+import { BiEnvelope } from 'react-icons/bi'
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState<string | ArrayBuffer | null>(null)
@@ -31,6 +32,7 @@ const ProfilePage = () => {
 
   const { data: authUser } = useGetUser()
   const { username } = useParams()
+  const navigate = useNavigate()
 
   const { data: userProfile, isLoading, isRefetching } = useGetUserProfile(username)
 
@@ -43,13 +45,17 @@ const ProfilePage = () => {
   const memberSinceDate = userProfile ? formatMemberSinceDate(userProfile.createdAt) : ''
 
   const isMyProfile = authUser?._id === userProfile?._id
-  const isUserFollowedByMe = authUser.following.includes(userProfile?._id)
+  const isUserFollowedByMe = userProfile && authUser?.following.includes(userProfile?._id)
 
   const getButtonLabel = () => {
     if (isPending && isUserFollowedByMe) return 'Unfollowing...'
     if (isPending && !isUserFollowedByMe) return 'Following...'
     if (!isPending && isUserFollowedByMe) return 'Unfollow'
     if (!isPending && !isUserFollowedByMe) return 'Follow'
+  }
+
+  const handleMessageClick = () => {
+    navigate(`/chat/${userProfile?._id}`)
   }
 
   useEffect(() => {
@@ -80,7 +86,15 @@ const ProfilePage = () => {
                 setProfileImg={setProfileImg}
               />
 
-              <div className="flex justify-end px-4 mt-5">
+              <div className="flex gap-2 justify-end items-center px-4 mt-5">
+                {!isMyProfile && (
+                  <BiEnvelope
+                    size={32}
+                    onClick={handleMessageClick}
+                    className="cursor-pointer border-2 border-zinc-700 rounded-full p-1"
+                  />
+                )}
+
                 {isMyProfile && <EditProfileModal />}
                 {!isMyProfile && (
                   <Button
@@ -172,7 +186,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          {!isLoading && !isRefetching && <Posts feedType={feedType} />}
+          {!isLoading && !isRefetching && <Posts />}
         </div>
       </div>
     </feedTypeContext.Provider>
