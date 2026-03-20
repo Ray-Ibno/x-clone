@@ -25,15 +25,15 @@ export const changeFollowStatus = async (targetUserId, currentUserId) => {
 
   if (!currentUser || !userToFollowUnfollow) throw new AppError('User not found', 404)
 
-  if (currentUser.following.includes(id)) {
+  if (currentUser.following.includes(targetUserId)) {
     //unfollow
-    await User.findByIdAndUpdate(currentUserId, { $pull: { following: id } })
+    await User.findByIdAndUpdate(currentUserId, { $pull: { following: targetUserId } })
     await User.findByIdAndUpdate(id, { $pull: { followers: currentUserId } })
-    return { message: `you unfollowed ${userToFollowUnfollow.username}` }
+    return { message: `You unfollowed ${userToFollowUnfollow.username}` }
   } else {
     //follow
-    await User.findByIdAndUpdate(currentUserId, { $push: { following: id } })
-    await User.findByIdAndUpdate(id, { $push: { followers: currentUserId } })
+    await User.findByIdAndUpdate(currentUserId, { $push: { following: targetUserId } })
+    await User.findByIdAndUpdate(targetUserId, { $push: { followers: currentUserId } })
 
     const notification = new Notification({
       to: userToFollowUnfollow._id,
@@ -43,7 +43,7 @@ export const changeFollowStatus = async (targetUserId, currentUserId) => {
 
     await notification.save()
 
-    return { message: `you followed ${userToFollowUnfollow.username}` }
+    return { message: `You followed ${userToFollowUnfollow.username}` }
   }
 }
 
