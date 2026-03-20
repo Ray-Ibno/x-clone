@@ -1,8 +1,9 @@
 import AppError from '../errors/AppError.js'
-import { v2 as cloudinary } from 'cloudinary'
 import { getReceiverSocketId, io } from '../listeners/socket.js'
 import { Chat, Message } from '../models/message.model.js'
 import User from '../models/user.model.js'
+
+import cloudinary from '../config/cloudinary.js'
 
 export const getChats = async (loggedInUserId) => {
   const chats = await Chat.find({ members: { $in: [loggedInUserId] } })

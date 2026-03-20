@@ -2,7 +2,8 @@ import AppError from '../errors/AppError.js'
 import Notification from '../models/notification.model.js'
 import User from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
-import { v2 as cloudinary } from 'cloudinary'
+
+import cloudinary from '../config/cloudinary.js'
 
 export const fetchUserDetails = async (username) => {
   const user = await User.findOne({ username }).select('-password')
