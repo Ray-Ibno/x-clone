@@ -1,125 +1,54 @@
-import User from '../models/user.model.js'
-import bcrypt from 'bcryptjs'
 import generateTokenAndSetCookie from '../utils/generateToken.js'
+import * as authService from '../services/auth.service.js'
 
 export const signup = async (req, res) => {
-  const { username, fullName, password, email, passwordRepeat } = req.body
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-  const saltRounds = 10
+  const newUser = await authService.register(
+    req.body.username,
+    req.body.fullName,
+    req.body.email,
+    req.body.password,
+  )
 
-  try {
-    if (!username || !fullName || !password || !email || !passwordRepeat) {
-      return res.status(400).json({ message: 'Please input all fields' })
-    }
+  generateTokenAndSetCookie(newUser._id, res)
 
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Invalid email format' })
-    }
-
-    const emailExists = await User.findOne({ email })
-    if (emailExists) {
-      return res.status(400).json({ message: 'email already exists' })
-    }
-
-    const userExists = await User.findOne({ username })
-    if (userExists) {
-      return res.status(400).json({ message: 'username already exists' })
-    }
-
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: 'password must be 6 characters or more' })
-    }
-
-    if (password !== passwordRepeat) {
-      return res.status(400).json({ message: "password don't match" })
-    }
-
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
-
-    const newUser = await User.create({
-      username,
-      fullName,
-      password: hashedPassword,
-      email,
-    })
-
-    if (newUser) {
-      generateTokenAndSetCookie(newUser._id, res)
-      await newUser.save()
-
-      res.status(201).json({
-        username: newUser.username,
-        fullName: newUser.fullName,
-        password: newUser.password,
-        email: newUser.email,
-        followers: newUser.followers,
-        following: newUser.following,
-        profileImg: newUser.profileImg,
-        coverImg: newUser.coverImg,
-        bio: newUser.bio,
-        link: newUser.link,
-      })
-    }
-  } catch (error) {
-    console.log('Error at signup controller', error.message)
-    res.status(500).json({ error: 'Internal server error' })
-  }
+  res.status(201).json({
+    username: newUser.username,
+    fullName: newUser.fullName,
+    password: newUser.password,
+    email: newUser.email,
+    followers: newUser.followers,
+    following: newUser.following,
+    profileImg: newUser.profileImg,
+    coverImg: newUser.coverImg,
+    bio: newUser.bio,
+    link: newUser.link,
+  })
 }
 
 export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body
-    const user = await User.findOne({ email })
-    const isPasswordMatched = await bcrypt.compare(
-      password,
-      user?.password || ''
-    )
+  const user = await authService.signIn(req.body.email, req.body.password)
 
-    if (!user) {
-      return res.status(400).json({ message: 'invalid email' })
-    }
+  generateTokenAndSetCookie(user.id, res)
 
-    if (!isPasswordMatched) {
-      return res.status(400).json({ message: 'invalid password' })
-    }
-
-    generateTokenAndSetCookie(user.id, res)
-
-    res.status(200).json({
-      username: user.username,
-      fullName: user.fullName,
-      email: user.email,
-      followers: user.followers,
-      following: user.following,
-      profileImg: user.profileImg,
-      coverImg: user.coverImg,
-      bio: user.bio,
-      link: user.link,
-    })
-  } catch (error) {
-    console.log('Error at login controller', error.message)
-    res.status(500).json({ error: 'Internal server error ' })
-  }
+  res.status(200).json({
+    username: user.username,
+    fullName: user.fullName,
+    email: user.email,
+    followers: user.followers,
+    following: user.following,
+    profileImg: user.profileImg,
+    coverImg: user.coverImg,
+    bio: user.bio,
+    link: user.link,
+  })
 }
 
 export const logout = async (req, res) => {
-  try {
-    res.cookie('jwt', '', { maxAge: 0 })
-    res.status(200).json({ message: 'successfully logged out' })
-  } catch (error) {
-    console.log('Error at logout controller', error.message)
-    res.status(500).json({ error: 'Internal server error' })
-  }
+  res.cookie('jwt', '', { maxAge: 0 })
+  res.status(200).json({ message: 'successfully logged out' })
 }
 
 export const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select('-password')
-    res.status(200).json(user)
-  } catch (error) {
-    console.log('Error at getUser controller', error.message)
-    res.status(500).json({ error: 'Internal server error' })
-  }
+  const user = await authService.findUser(req.user._id)
+  res.status(200).json(user)
 }

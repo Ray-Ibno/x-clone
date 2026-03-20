@@ -1,4 +1,5 @@
 import mongoose, { mongo } from 'mongoose'
+import AppError from '../errors/AppError.js'
 
 const userSchema = new mongoose.Schema(
   {
@@ -59,45 +60,38 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 userSchema.statics.findSuggestedUsers = async function (userId, limit) {
-  try {
-    const currentUser = await this.findById(userId)
-    if (!currentUser) {
-      throw new Error('User not found')
-    }
+  const currentUser = await this.findById(userId)
+  if (!currentUser) throw new AppError('User not found')
 
-    const usersToExclude = [userId, ...currentUser.following]
+  const usersToExclude = [userId, ...currentUser.following]
 
-    const suggestedUsers = await this.aggregate([
-      {
-        $match: {
-          _id: { $nin: usersToExclude },
-        },
+  const suggestedUsers = await this.aggregate([
+    {
+      $match: {
+        _id: { $nin: usersToExclude },
       },
-      {
-        $limit: limit,
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $project: {
+        username: 1,
+        fullName: 1,
+        profileImg: 1,
       },
-      {
-        $project: {
-          username: 1,
-          fullName: 1,
-          profileImg: 1,
-        },
+    },
+    {
+      $sample: {
+        size: 10,
       },
-      {
-        $sample: {
-          size: 10,
-        },
-      },
-    ])
-    return suggestedUsers
-  } catch (error) {
-    console.log('Error at finding suggested users', error.message)
-    throw error
-  }
+    },
+  ])
+  return suggestedUsers
 }
 
 const User = mongoose.model('User', userSchema)
