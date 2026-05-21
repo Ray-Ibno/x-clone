@@ -4,7 +4,7 @@ A clone of X (formerly named Twitter). Managing posts and creating user accounts
 
 # 🚀 Live Demo
 
-🔗 (X-Clone)[https://mern-netflix-clone-gofs.onrender.com/]
+🔗 [X-Clone](https://mern-netflix-clone-gofs.onrender.com/)
 
 # ✨ Features
 
