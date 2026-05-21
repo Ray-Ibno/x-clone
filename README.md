@@ -2,11 +2,11 @@
 
 A clone of X (formerly named Twitter). Managing posts and creating user accounts are some of the key features.
 
-# 🚀 Live Demo
+## 🚀 Live Demo
 
 🔗 [X-Clone](https://mern-netflix-clone-gofs.onrender.com/)
 
-# ✨ Features
+## ✨ Features
 
 - **Real-time chat:** Uses Websockets for chatting with other account in real time
 - **Responsive Design:** Styled with Tailwind CSS for a better UX on all devices
@@ -15,23 +15,23 @@ A clone of X (formerly named Twitter). Managing posts and creating user accounts
 - **Refresh Token:** Refresh tokens stored in Redis database for improved authentication without affecting user experience
 - **Temporary data storage in Redis:** Fetched data will be stored in Redis temporarily to refetch it faster later
 
-# 🛠️ Tech Stack
+## 🛠️ Tech Stack
 
 - **Frontend:** React, Tanstack Query, Tailwind CSS
 - **Backend:** Node.js, Express.js
 - **Database:** Mongodb, Mongoose, Redis
 - **Authentication:** JSON Web Tokens (JWT), Bcrypt (Password Hashing)
 
-# ⚙️ How to Run the Project Locally
+## ⚙️ How to Run the Project Locally
 
-### 1. Clone the Project
+#### 1. Clone the Project
 
 ```bash
 git clone https://github.com/Ray-Ibno/x-clone.git
 cd x-clone
 ```
 
-### 2. Set Up Environmental Variables
+#### 2. Set Up Environmental Variables
 
 Create a .env file in the root folder
 
@@ -49,7 +49,7 @@ Create a .env.development in the frontend folder
 VITE_SOCKET_URL=http://localhost:5100
 ```
 
-### 3. Install Dependencies and Start
+#### 3. Install Dependencies and Start
 
 Open a new terminal and paste this code
 
@@ -68,7 +68,7 @@ npm run dev
 
 Open http://localhost:5100 in your browser
 
-# 📁 Project Folder Structure
+## 📁 Project Folder Structure
 
 ```text
 project-root/
@@ -93,7 +93,7 @@ project-root/
     │   └── utils/          # Helper functions and API utilities
 ```
 
-# 🧠 What I Learned
+## 🧠 What I Learned
 
 - **Real Time Data:** Implemantation of real time chat feature using WebSockets
 - **Refreshing Access Tokens:** How refresh token works in making security more robust while still maintaining seamless user experience
