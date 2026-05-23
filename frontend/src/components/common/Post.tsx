@@ -40,17 +40,30 @@ const Post = ({ post }: { post: POST }) => {
     <>
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
         <div className="avatar">
-          <Link to={`/profile/${postOwner.username}`} className="w-8 rounded-full overflow-hidden">
-            <img src={postOwner.profileImg || '/avatar-placeholder.png'} />
+          <Link
+            to={`/profile/${postOwner.username}`}
+            aria-label={`${postOwner.username}'s post`}
+            className="w-8 rounded-full overflow-hidden"
+          >
+            <img alt="Post profile image" src={postOwner.profileImg || '/avatar-placeholder.png'} />
           </Link>
         </div>
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
-            <Link to={`/profile/${postOwner.username}`} className="font-bold">
+            <Link
+              to={`/profile/${postOwner.username}`}
+              aria-label={`Link to ${postOwner.username}'s profile page`}
+              className="font-bold"
+            >
               {postOwner.fullName}
             </Link>
-            <span className="text-gray-700 flex gap-1 text-sm">
-              <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
+            <span className="text-gray-400 flex gap-1 text-sm">
+              <Link
+                to={`/profile/${postOwner.username}`}
+                aria-label={`Link to ${postOwner.username}'s profile page`}
+              >
+                @{postOwner.username}
+              </Link>
               <span>·</span>
               <span>{formattedDate}</span>
             </span>
@@ -87,29 +100,29 @@ const Post = ({ post }: { post: POST }) => {
                   comment_Modal.showModal()
                 }}
               >
-                <FaRegComment className="w-4 h-4  text-slate-500 group-hover:text-sky-400" />
-                <span className="text-sm text-slate-500 group-hover:text-sky-400">
+                <FaRegComment className="w-4 h-4  text-slate-300 group-hover:text-sky-400" />
+                <span className="text-sm text-slate-300 group-hover:text-sky-400">
                   {post.comments.length}
                 </span>
               </div>
               {/* We're using Modal Component from DaisyUI */}
               <CommentDialog post={post} />
               <div className="flex gap-1 items-center group cursor-pointer">
-                <BiRepost className="w-6 h-6  text-slate-500 group-hover:text-green-500" />
-                <span className="text-sm text-slate-500 group-hover:text-green-500">0</span>
+                <BiRepost className="w-6 h-6  text-slate-300 group-hover:text-green-500" />
+                <span className="text-sm text-slate-300 group-hover:text-green-500">0</span>
               </div>
               <div
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
                 {!isLiked && (
-                  <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
+                  <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-300 group-hover:text-pink-500" />
                 )}
                 {isLiked && <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />}
 
                 <span
                   className={`text-sm group-hover:text-pink-500 ${
-                    isLiked ? 'text-pink-500' : ' text-slate-500'
+                    isLiked ? 'text-pink-500' : ' text-slate-300'
                   }`}
                 >
                   {post.likes.length}
@@ -117,7 +130,7 @@ const Post = ({ post }: { post: POST }) => {
               </div>
             </div>
             <div className="flex w-1/3 justify-end gap-2 items-center">
-              <FaRegBookmark className="w-4 h-4 text-slate-500 cursor-pointer" />
+              <FaRegBookmark className="w-4 h-4 text-slate-300 cursor-pointer" />
             </div>
           </div>
         </div>

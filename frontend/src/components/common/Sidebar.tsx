@@ -21,13 +21,14 @@ const Sidebar = () => {
   return (
     <div className="md:flex-[2_2_0] max-w-52">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
-        <Link to="/" className="flex justify-center md:justify-start">
+        <Link to="/" aria-label="Link to home" className="flex justify-center md:justify-start">
           <XSvg className="px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900" />
         </Link>
         <ul className="flex flex-col gap-3 mt-4">
           <li className="flex justify-center md:justify-start">
             <Link
               to="/"
+              aria-label="Link to home"
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <MdHomeFilled className="w-8 h-8" />
@@ -39,6 +40,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
+              aria-label="Link to notifications"
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <IoNotifications className="w-6 h-6" />
@@ -51,6 +53,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/chat`}
+              aria-label="Link to messages"
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <FaRegEnvelope className="w-6 h-6" />
@@ -63,6 +66,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/profile/${authUser?.username}`}
+              aria-label="Link to your profile page"
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <FaUser className="w-6 h-6" />
@@ -75,6 +79,7 @@ const Sidebar = () => {
 
         <Link
           to={`/profile/${authUser?.username}`}
+          aria-label="Link to your profile page"
           className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full"
         >
           <div className={`avatar ${location.pathname !== '/chat' && 'hidden'} md:inline-flex`}>
@@ -88,7 +93,11 @@ const Sidebar = () => {
               <p className="text-slate-500 text-sm">@{authUser?.username}</p>
             </div>
             {location.pathname !== '/chat' && (
-              <BiLogOut className="w-5 h-5 cursor-pointer" onClick={handleLogout} />
+              <BiLogOut
+                aria-label="Logout button"
+                className="w-5 h-5 cursor-pointer"
+                onClick={handleLogout}
+              />
             )}
           </div>
         </Link>

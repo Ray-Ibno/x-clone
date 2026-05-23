@@ -85,6 +85,7 @@ const UserProfileImages = ({
               userProfile?.profileImg ||
               '/avatar-placeholder.png'
             }
+            alt="user avatar"
           />
           <div className="absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer">
             {isMyProfile && (

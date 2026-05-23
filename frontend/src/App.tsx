@@ -32,7 +32,7 @@ function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <div className="flex max-w-6xl mx-auto font-display">
+      <main className="flex max-w-6xl mx-auto font-display">
         {authUser && <Sidebar />}
         <Routes>
           <Route path="/" element={authUser ? <HomePage /> : <Navigate to={'/login'} />} />
@@ -50,7 +50,7 @@ function App() {
         </Routes>
         {authUser && !/^\/chat(\/[^/]+)?\/?$/.test(location.pathname) && <RightPanel />}
         <Toaster />
-      </div>
+      </main>
     </ErrorBoundary>
   )
 }

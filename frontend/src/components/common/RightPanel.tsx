@@ -16,8 +16,7 @@ const RightPanel = () => {
 
   const { mutate: followUser, isPending } = useFollow(selectedSuggetedUser)
 
-  if (suggestedUsers && suggestedUsers.length < 1)
-    return <div className="md:w-64 w-0"></div>
+  if (suggestedUsers && suggestedUsers.length < 1) return <div className="md:w-64 w-0"></div>
 
   return (
     <div className="hidden lg:block my-4 mx-2">
@@ -38,6 +37,7 @@ const RightPanel = () => {
             suggestedUsers?.map((user: User) => (
               <Link
                 to={`/profile/${user.username}`}
+                aria-label={`Link to ${user.username}'s profile page`}
                 className="flex items-center justify-between gap-4"
                 key={user._id}
               >
@@ -51,17 +51,13 @@ const RightPanel = () => {
                     <span className="font-semibold tracking-tight truncate w-28">
                       {user.fullName}
                     </span>
-                    <span className="text-sm text-slate-500">
-                      @{user.username}
-                    </span>
+                    <span className="text-sm text-slate-500">@{user.username}</span>
                   </div>
                 </div>
                 <div>
                   <Button
                     className="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
-                    onClick={(
-                      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-                    ) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                       e.preventDefault()
                       setSelectedSuggestedUser(user._id)
                       followUser()
