@@ -12,7 +12,9 @@ import useDelete from '../../hooks/useDelete'
 import useLike from '../../hooks/useLike'
 import useGetUser from '../../hooks/useGetUser'
 import { formatPostDate } from '../../utils/date'
-import CommentDialog from './CommentDialog'
+import { lazy, Suspense } from 'react'
+
+const CommentDialog = lazy(() => import('./CommentDialog'))
 
 const Post = ({ post }: { post: POST }) => {
   const { data: authUser } = useGetUser()
@@ -106,7 +108,9 @@ const Post = ({ post }: { post: POST }) => {
                 </span>
               </div>
               {/* We're using Modal Component from DaisyUI */}
-              <CommentDialog post={post} />
+              <Suspense fallback={null}>
+                <CommentDialog post={post} />
+              </Suspense>
               <div className="flex gap-1 items-center group cursor-pointer">
                 <BiRepost className="w-6 h-6  text-slate-300 group-hover:text-green-500" />
                 <span className="text-sm text-slate-300 group-hover:text-green-500">0</span>
