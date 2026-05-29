@@ -6,7 +6,7 @@ A clone of X (formerly named Twitter). Managing posts and creating user accounts
 
 🔗 [X-Clone](https://mern-netflix-clone-gofs.onrender.com/)
 
-## ✨ Features
+## ✨ Key Features
 
 - **Real-time chat:** Uses Websockets for chatting with other account in real time
 - **Responsive Design:** Styled with Tailwind CSS for a better UX on all devices
@@ -14,6 +14,47 @@ A clone of X (formerly named Twitter). Managing posts and creating user accounts
 - **User Interactions:** Follow a user and like, comment, or even save the posts
 - **Refresh Token:** Refresh tokens stored in Redis database for improved authentication without affecting user experience
 - **Temporary data storage in Redis:** Fetched data will be stored in Redis temporarily to refetch it faster later
+- **Graceful Shutdown** To ensure data integrity and a seamless user experience during deployments or server maintenance.
+
+<details>
+<summary><b>🔍 View Implementation Snippet</b></summary>
+
+```javascript
+export const setUpGracefulShutdown = (server) => {
+  const handler = (signal) => {
+    console.log(`\nReceived ${signal}, starting graceful shutdown...`)
+
+    server.close(async (err) => {
+      if (err) {
+        console.error('Error closing the server', err)
+        process.exit(1)
+      }
+
+      console.log('Http server closed.')
+
+      try {
+        await mongoose.connection.close()
+        console.log('Database connection closed.')
+
+        process.exit(0)
+      } catch (dbErr) {
+        console.error('Error closing the database', dbErr)
+        process.exit(1)
+      }
+    })
+
+    setTimeout(() => {
+      console.log('Shutdown timed out, forcing exit.')
+      process.exit(1)
+    }, 10000)
+  }
+
+  process.on('SIGTERM', () => handler('SIGTERM'))
+  process.on('SIGINT', () => handler('SIGINT'))
+}
+```
+
+</details>
 
 ## 🛠️ Tech Stack
 
