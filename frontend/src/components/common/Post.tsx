@@ -101,7 +101,9 @@ const Post = ({ post, priority }: PostProps) => {
                 alt={`Post image of ${post.user}`}
                 loading="eager"
                 fetchPriority="high"
-                className="tweet-main-image"
+                className="tweet-main-image w-[600px] h-auto"
+                width={600}
+                height={400}
               />
             )}
             {post.img && priority === 'low' && <PostImg post={post} />}

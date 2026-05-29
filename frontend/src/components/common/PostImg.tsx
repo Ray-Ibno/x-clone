@@ -29,7 +29,7 @@ const PostImg = ({ post }: PostImgProps) => {
     <AdvancedImage
       cldImg={optimizedPostImg}
       plugins={[lazyload({ rootMargin: '10px', threshold: 0.2 }), placeholder({ mode: 'blur' })]}
-      className="h-80 object-contain rounded-lg border border-gray-700"
+      className="h-80 object-contain rounded-lg border border-gray-700 w-full"
       alt="Post Img"
     />
   ) : post.img ? (
