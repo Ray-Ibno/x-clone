@@ -22,8 +22,14 @@ const Posts = () => {
       )}
       {!isLoading && !isRefetching && POSTS && (
         <div>
-          {POSTS.map((post: POST) => (
-            <Post key={post._id} post={post} />
+          {/* Recent Posts */}
+          {POSTS.slice(0, 3).map((post: POST) => (
+            <Post key={post._id} post={post} priority="high" />
+          ))}
+
+          {/* Below Posts */}
+          {POSTS.slice(4).map((post: POST) => (
+            <Post key={post._id} post={post} priority="low" />
           ))}
         </div>
       )}

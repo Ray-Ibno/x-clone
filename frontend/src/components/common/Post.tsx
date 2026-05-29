@@ -13,11 +13,17 @@ import useLike from '../../hooks/useLike'
 import useGetUser from '../../hooks/useGetUser'
 import { formatPostDate } from '../../utils/date'
 import { lazy, Suspense } from 'react'
+import { preload } from 'react-dom'
 import PostImg from './PostImg'
 
 const CommentDialog = lazy(() => import('./CommentDialog'))
 
-const Post = ({ post }: { post: POST }) => {
+type PostProps = {
+  post: POST
+  priority: 'low' | 'high'
+}
+
+const Post = ({ post, priority }: PostProps) => {
   const { data: authUser } = useGetUser()
 
   const { mutate: likePost, isPending: isLiking } = useLike(post._id)
@@ -29,6 +35,10 @@ const Post = ({ post }: { post: POST }) => {
   const isMyPost = postOwner._id === authUser?._id
 
   const formattedDate = formatPostDate(post.createdAt)
+
+  if (post.img && priority === 'high') {
+    preload(post.img, { as: 'image', fetchPriority: 'high' })
+  }
 
   const handleDeletePost = () => {
     deletePost()
@@ -84,7 +94,17 @@ const Post = ({ post }: { post: POST }) => {
           </div>
           <div className="flex flex-col gap-3 overflow-hidden">
             <span>{post.text}</span>
-            {post.img && <PostImg post={post} />}
+            {/* posts with priority set to high have images with high fetchPriority to improve performance(LCP) */}
+            {post.img && priority === 'high' && (
+              <img
+                src={post.img}
+                alt={`Post image of ${post.user}`}
+                loading="eager"
+                fetchPriority="high"
+                className="tweet-main-image"
+              />
+            )}
+            {post.img && priority === 'low' && <PostImg post={post} />}
           </div>
           <div className="flex justify-between mt-3">
             <div className="flex gap-4 items-center w-2/3 justify-between">
