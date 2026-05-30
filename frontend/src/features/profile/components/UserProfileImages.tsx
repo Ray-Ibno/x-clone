@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { User } from '../../../types/user-model'
 import { MdEdit } from 'react-icons/md'
 
@@ -23,6 +23,8 @@ const UserProfileImages = ({
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 
+  const [isCoverImgLoaded, setIsCoverImgLoaded] = useState(false)
+
   const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: string) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
@@ -45,12 +47,13 @@ const UserProfileImages = ({
     <div className="relative group/cover">
       {/* COVER IMAGE */}
       <img
+        onLoad={() => setIsCoverImgLoaded(true)}
         src={
           (typeof imgs.coverImg === 'string' && imgs.coverImg) ||
           userProfile?.coverImg ||
           '/cover.png'
         }
-        className="h-52 w-full object-cover"
+        className={`h-52 w-full object-cover ${isCoverImgLoaded ? 'blur-none' : 'blur-sm'}`}
         alt="cover image"
       />
       {isMyProfile && (
