@@ -58,7 +58,7 @@ export const setUpGracefulShutdown = (server) => {
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React, Tanstack Query, Tailwind CSS
+- **Frontend:** React, Tanstack Query, Zustand, Tailwind CSS
 - **Backend:** Node.js, Express.js
 - **Database:** Mongodb, Mongoose, Redis
 - **Authentication:** JSON Web Tokens (JWT), Bcrypt (Password Hashing)
