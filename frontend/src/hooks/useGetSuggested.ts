@@ -10,16 +10,13 @@ const useGetSuggestedUsers = () => {
     queryKey: ['suggestedUsers', accessToken],
     queryFn: async () => {
       try {
-        return (
-          accessToken &&
-          fetchData<User[]>('/api/users/suggested', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-            },
-          })
-        )
+        return fetchData<User[]>('/api/users/suggested', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        })
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
