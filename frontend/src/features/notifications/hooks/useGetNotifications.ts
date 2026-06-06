@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import fetchData from '../../../utils/api/fetchData'
+import useAuth from '../../auth/hooks/useAuth'
 
 type Notification = {
   _id: string
@@ -12,11 +13,18 @@ type Notification = {
 }[]
 
 const useGetNotifications = () => {
+  const { accessToken } = useAuth()
+
   return useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
-        return fetchData<Notification>('/api/notifications')
+        return fetchData<Notification>('/api/notifications', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

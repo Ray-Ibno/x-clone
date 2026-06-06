@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import toast from 'react-hot-toast'
 import fetchData from '../../../utils/api/fetchData'
+import useAuth from '../../auth/hooks/useAuth'
 
 type UpdateData = {
   username?: string
@@ -14,6 +15,8 @@ type UpdateData = {
 }
 
 const useUpdateProfile = (updateData: UpdateData) => {
+  const { accessToken } = useAuth()
+
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
@@ -22,6 +25,7 @@ const useUpdateProfile = (updateData: UpdateData) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(updateData),
         })

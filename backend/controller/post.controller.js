@@ -26,7 +26,7 @@ export const createPost = async (req, res) => {
 }
 
 export const deletePost = async (req, res) => {
-  await postService.removePost(req.params.id)
+  await postService.removePost(req.params.id, req.user._id)
   res.status(200).json({ message: 'Post was successfully deleted' })
 }
 

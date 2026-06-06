@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import fetchData from '../utils/api/fetchData'
+import useAuth from '../features/auth/hooks/useAuth'
 
 interface ApiResponse {
   status: 'success' | 'error'
@@ -11,12 +12,17 @@ interface ApiResponse {
 }
 
 const useFollow = (id: string | undefined) => {
+  const { accessToken } = useAuth()
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
         return fetchData<ApiResponse>(`/api/users/follow/${id}`, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
         })
       } catch (error) {
         if (error instanceof Error) {
@@ -29,7 +35,7 @@ const useFollow = (id: string | undefined) => {
     onSuccess: (data) => {
       Promise.all([
         ['authUser', 'suggestedUsers'].map((key) =>
-          queryClient.invalidateQueries({ queryKey: [key] })
+          queryClient.invalidateQueries({ queryKey: [key] }),
         ),
       ])
 

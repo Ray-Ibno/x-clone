@@ -15,13 +15,14 @@ type ChatStore = {
   isChatLoading: boolean
   isMessageLoading: boolean
   actions: {
-    getMessages: (userToChatId: string) => Promise<void>
-    getChats: () => Promise<void>
+    getMessages: (userToChatId: string, accessToken: string) => Promise<void>
+    getChats: (accessToken: string) => Promise<void>
     sendMessage: (
       userToChatId: string,
       message: { text: string | null; image: string | null },
+      accessToken: string,
     ) => Promise<void>
-    getUserFromProfilePage: (id: string) => Promise<void>
+    getUserFromProfilePage: (id: string, accessToken: string) => Promise<void>
     addMessage: (newMessage: Message) => void
 
     setSelectedUser: (arg: User | null) => void
@@ -41,10 +42,15 @@ export const useChatStore = create<ChatStore>((set, get, store) => ({
   isChatLoading: false,
   isMessageLoading: false,
   actions: {
-    getMessages: async (userToChatId) => {
+    getMessages: async (userToChatId, accessToken) => {
       set({ isMessageLoading: true })
       try {
-        const response = await fetch(`/api/messages/${userToChatId}`)
+        const response = await fetch(`/api/messages/${userToChatId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
         const messages = (await response.json()) as Message[]
         set({ messages })
       } catch (error) {
@@ -57,10 +63,15 @@ export const useChatStore = create<ChatStore>((set, get, store) => ({
         set({ isMessageLoading: false })
       }
     },
-    getChats: async () => {
+    getChats: async (accessToken) => {
       set({ isChatLoading: true })
       try {
-        const response = await fetch('/api/messages/chats')
+        const response = await fetch('/api/messages/chats', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
         const chats = await response.json()
 
         set({ chats })
@@ -74,13 +85,14 @@ export const useChatStore = create<ChatStore>((set, get, store) => ({
         set({ isChatLoading: false })
       }
     },
-    sendMessage: async (userToChatId, message) => {
+    sendMessage: async (userToChatId, message, accessToken) => {
       const { messages } = get()
       try {
         const response = await fetch(`/api/messages/send/${userToChatId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(message),
         })
@@ -98,9 +110,14 @@ export const useChatStore = create<ChatStore>((set, get, store) => ({
         }
       }
     },
-    getUserFromProfilePage: async (id) => {
+    getUserFromProfilePage: async (id, accessToken) => {
       try {
-        const response = await fetch(`/api/messages/user/${id}`)
+        const response = await fetch(`/api/messages/user/${id}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
         const user = await response.json()
         set({ userFromProfilePage: user })
       } catch (error) {

@@ -5,17 +5,22 @@ import fetchData from '../utils/api/fetchData'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
+import useAuth from '../features/auth/hooks/useAuth'
 
 const useLike = (postId: string) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
+  const { accessToken } = useAuth()
 
   return useMutation({
     mutationFn: async () => {
       try {
         return fetchData<string[]>(`/api/posts/like/${postId}`, {
           method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         })
       } catch (error) {
         if (error instanceof Error) {
@@ -31,7 +36,7 @@ const useLike = (postId: string) => {
       }
       queryClient.setQueryData(['posts', feedType, username], (oldData: POST[]) => {
         return oldData?.map((post) =>
-          post._id === postId ? { ...post, likes: updatedLikes } : post
+          post._id === postId ? { ...post, likes: updatedLikes } : post,
         )
       })
     },

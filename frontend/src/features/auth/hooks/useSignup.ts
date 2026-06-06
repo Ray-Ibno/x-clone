@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import fetchData from '../../../utils/api/fetchData'
 import type { User } from '../../../types/user-model'
+import useAuth from './useAuth'
 
 type RequestData = {
   email: string
@@ -14,23 +15,27 @@ type RequestData = {
 
 const useSignUp = (requestData: RequestData) => {
   const queryClient = useQueryClient()
+  const { signup } = useAuth()
 
   return useMutation({
     mutationFn: async () => {
       try {
-        return fetchData<User>('/api/auth/signup', {
+        const data = await fetchData<User>('/api/auth/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestData),
         })
+
+        signup(data.accessToken)
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
         } else {
           console.error('An unknown error occured')
         }
+        throw error
       }
     },
     onSuccess: () => {

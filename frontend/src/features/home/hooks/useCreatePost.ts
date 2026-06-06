@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import fetchData from '../../.././utils/api/fetchData'
 import type { POST } from '../../../types/post-model'
+import useAuth from '../../auth/hooks/useAuth'
 
 type PostData = {
   text: string
@@ -11,6 +12,7 @@ type PostData = {
 
 const useCreatePost = () => {
   const queryClient = useQueryClient()
+  const { accessToken } = useAuth()
 
   return useMutation({
     mutationFn: async (postData: PostData) => {
@@ -19,6 +21,7 @@ const useCreatePost = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(postData),
         })

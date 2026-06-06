@@ -1,5 +1,7 @@
-import generateTokenAndSetCookie from '../utils/generateToken.js'
+import { generateAccessToken, generateRefreshToken, jwt } from '../utils/generateTokens.js'
 import * as authService from '../services/auth.service.js'
+import AppError from '../errors/AppError.js'
+import redis from '../config/redis.js'
 
 export const signup = async (req, res) => {
   const newUser = await authService.register(
@@ -9,9 +11,11 @@ export const signup = async (req, res) => {
     req.body.password,
   )
 
-  generateTokenAndSetCookie(newUser._id, res)
+  const accessToken = generateAccessToken(newUser._id, res)
+  await generateRefreshToken(newUser._id, res)
 
   res.status(201).json({
+    accessToken,
     username: newUser.username,
     fullName: newUser.fullName,
     password: newUser.password,
@@ -28,9 +32,11 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const user = await authService.signIn(req.body.email, req.body.password)
 
-  generateTokenAndSetCookie(user.id, res)
+  const accessToken = generateAccessToken(user.id, res)
+  await generateRefreshToken(user.id, res)
 
   res.status(200).json({
+    accessToken,
     username: user.username,
     fullName: user.fullName,
     email: user.email,
@@ -51,4 +57,19 @@ export const logout = async (req, res) => {
 export const getUser = async (req, res) => {
   const user = await authService.findUser(req.user._id)
   res.status(200).json(user)
+}
+
+export const refresh = async (req, res) => {
+  const cookies = req.cookies
+  if (!cookies?.jwt) throw new AppError('No jwt cookies found', 401)
+  const refreshToken = cookies.jwt
+
+  const storedRefreshToken = await redis.get('x-clone-jwt')
+  if (refreshToken !== storedRefreshToken) throw new AppError('Expired token', 403)
+
+  const verifiedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+  if (!verifiedRefreshToken) throw new AppError('Invalid token', 403)
+
+  const accessToken = generateAccessToken(verifiedRefreshToken.userId, res)
+  res.json({ accessToken })
 }

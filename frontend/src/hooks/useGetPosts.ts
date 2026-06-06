@@ -4,8 +4,10 @@ import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
+import useAuth from '../features/auth/hooks/useAuth'
 
 const useGetPosts = () => {
+  const { accessToken } = useAuth()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
   const getPostEndpoint = () => {
@@ -29,7 +31,13 @@ const useGetPosts = () => {
     queryKey: ['posts', feedType, username],
     queryFn: async () => {
       try {
-        return fetchData<POST[]>(endpoint)
+        return fetchData<POST[]>(endpoint, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        })
       } catch (error) {
         if (error instanceof Error) {
           console.error('Fetching Error: ', error.message)
@@ -38,6 +46,7 @@ const useGetPosts = () => {
         }
       }
     },
+    enabled: !!accessToken,
     retry: false,
   })
 }

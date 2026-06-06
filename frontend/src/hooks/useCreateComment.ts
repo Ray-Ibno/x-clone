@@ -5,11 +5,14 @@ import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
+import useAuth from '../features/auth/hooks/useAuth'
 
 const useCreateComment = (postId: string, text: string, success: () => void) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
+
+  const { accessToken } = useAuth()
 
   return useMutation({
     mutationFn: async () => {
@@ -18,6 +21,7 @@ const useCreateComment = (postId: string, text: string, success: () => void) => 
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({ text }),
         })
@@ -33,7 +37,7 @@ const useCreateComment = (postId: string, text: string, success: () => void) => 
       toast.success('Comment added')
       queryClient.setQueryData(['posts', feedType, username], (oldData: POST[]) => {
         return oldData.map((post) =>
-          post._id === postId ? { ...post, comments: updatedComments } : post
+          post._id === postId ? { ...post, comments: updatedComments } : post,
         )
       })
       success()

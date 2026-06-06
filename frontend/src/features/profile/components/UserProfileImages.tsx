@@ -1,17 +1,6 @@
 import { useRef, useState } from 'react'
-import type { User } from '../../../types/user-model'
+import type { UserProfileImageProps } from '../../../types/user-model'
 import { MdEdit } from 'react-icons/md'
-
-type UserProfileProps = {
-  userProfile: User
-  isMyProfile: boolean
-  imgs: {
-    coverImg: string | ArrayBuffer | null
-    profileImg: string | ArrayBuffer | null
-  }
-  setCoverImg: (data: string | ArrayBuffer | null) => void
-  setProfileImg: (data: string | ArrayBuffer | null) => void
-}
 
 const UserProfileImages = ({
   userProfile,
@@ -19,7 +8,7 @@ const UserProfileImages = ({
   imgs,
   setCoverImg,
   setProfileImg,
-}: UserProfileProps) => {
+}: UserProfileImageProps) => {
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 

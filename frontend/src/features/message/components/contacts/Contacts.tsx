@@ -5,26 +5,30 @@ import FilterBtns from './components/FilterBtns'
 import Header from './components/Header'
 import ContactSkeleton from './skeletons/ContactSkeleton'
 import { useParams } from 'react-router-dom'
+import useAuth from '../../../auth/hooks/useAuth'
 
 const Contacts = () => {
   const { isChatLoading, userFromProfilePage, selectedUser } = useChatStore()
   const { getUserFromProfilePage, setSelectedUser, getChats } = useChatActions()
+  const { accessToken } = useAuth()
 
   const { id } = useParams()
 
   useEffect(() => {
-    getChats()
+    if (accessToken) {
+      getChats(accessToken)
+    }
 
     if (userFromProfilePage) {
       setSelectedUser(userFromProfilePage)
     }
-  }, [getChats, setSelectedUser, userFromProfilePage])
+  }, [getChats, setSelectedUser, userFromProfilePage, accessToken])
 
   useEffect(() => {
-    if (id) {
-      getUserFromProfilePage(id)
+    if (id && accessToken) {
+      getUserFromProfilePage(id, accessToken)
     }
-  }, [id, getUserFromProfilePage])
+  }, [id, getUserFromProfilePage, accessToken])
 
   if (isChatLoading) return <ContactSkeleton />
 

@@ -4,16 +4,18 @@ import Header from './componetns/Header'
 import ChatInfo from './componetns/ChatInfo'
 import MessageInput from './componetns/MessageInput'
 import Conversation from './componetns/Conversation'
+import useAuth from '../../../auth/hooks/useAuth'
 
 const ChatBox = () => {
   const { selectedUser } = useChatStore()
   const { getMessages } = useChatActions()
+  const { accessToken } = useAuth()
 
   useEffect(() => {
-    if (selectedUser) {
-      getMessages(selectedUser._id)
+    if (selectedUser && accessToken) {
+      getMessages(selectedUser._id, accessToken)
     }
-  }, [selectedUser, getMessages])
+  }, [selectedUser, getMessages, accessToken])
 
   if (selectedUser) {
     return (

@@ -1,8 +1,7 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { Toaster } from 'react-hot-toast'
-import LoadingSpinner from './components/common/LoadingSpinner'
 
 import { lazy } from 'react'
 
@@ -16,23 +15,17 @@ import LazyRoute from './components/common/LazyRoute'
 import HomePage from './pages/home/HomePage'
 import LoginPage from './pages/auth/login/LoginPage'
 import SignUpPage from './pages/auth/signup/SignUpPage'
+import PublicRoute from './PublicRoute'
+import ProtectedRoute from './ProtectedRoute'
 
 const NotificationPage = lazy(() => import('./pages/notification/NotificationPage'))
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 
 function App() {
-  const { data: authUser, isLoading } = useGetUser()
+  const { data: authUser } = useGetUser()
 
   const location = useLocation()
-
-  if (isLoading) {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -40,23 +33,19 @@ function App() {
         {authUser && <Sidebar />}
 
         <Routes>
-          <Route path="/" element={authUser ? <HomePage /> : <Navigate to={'/login'} />} />
-          <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to={'/'} />} />
-          <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to={'/'} />} />
-          <Route
-            path="/notifications"
-            element={
-              authUser ? <LazyRoute component={NotificationPage} /> : <Navigate to={'/login'} />
-            }
-          />
-          <Route
-            path="/chat/:id?"
-            element={authUser ? <LazyRoute component={ChatPage} /> : <Navigate to={'/login'} />}
-          />
-          <Route
-            path="/profile/:username"
-            element={authUser ? <LazyRoute component={ProfilePage} /> : <Navigate to={'/login'} />}
-          />
+          {/* Guest Route */}
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+          </Route>
+
+          {/* Private Route */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/notifications" element={<LazyRoute component={NotificationPage} />} />
+            <Route path="/chat/:id?" element={<LazyRoute component={ChatPage} />} />
+            <Route path="/profile/:username" element={<LazyRoute component={ProfilePage} />} />
+          </Route>
         </Routes>
 
         {authUser && !/^\/chat(\/[^/]+)?\/?$/.test(location.pathname) && <RightPanel />}

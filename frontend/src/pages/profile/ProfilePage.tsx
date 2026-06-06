@@ -36,7 +36,7 @@ const ProfilePage = () => {
 
   const { data: userProfile, isLoading, isRefetching } = useGetUserProfile(username)
 
-  const { mutate: follow, isPending } = useFollow(userProfile?._id)
+  const { mutate: follow, isPending: isPendingFollow } = useFollow(userProfile?._id)
   const { mutateAsync: updateImage, isPending: isUpdating } = useUpdateProfile({
     coverImg,
     profileImg,
@@ -48,10 +48,10 @@ const ProfilePage = () => {
   const isUserFollowedByMe = userProfile && authUser?.following.includes(userProfile?._id)
 
   const getButtonLabel = () => {
-    if (isPending && isUserFollowedByMe) return 'Unfollowing...'
-    if (isPending && !isUserFollowedByMe) return 'Following...'
-    if (!isPending && isUserFollowedByMe) return 'Unfollow'
-    if (!isPending && !isUserFollowedByMe) return 'Follow'
+    if (isPendingFollow && isUserFollowedByMe) return 'Unfollowing...'
+    if (isPendingFollow && !isUserFollowedByMe) return 'Following...'
+    if (!isPendingFollow && isUserFollowedByMe) return 'Unfollow'
+    if (!isPendingFollow && !isUserFollowedByMe) return 'Follow'
   }
 
   const handleMessageClick = () => {
@@ -100,7 +100,7 @@ const ProfilePage = () => {
                   <Button
                     className="btn btn-outline rounded-full btn-sm"
                     onClick={() => {
-                      if (isPending) return
+                      if (isPendingFollow) return
                       follow()
                     }}
                     label={`${getButtonLabel()}`}

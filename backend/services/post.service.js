@@ -83,11 +83,11 @@ export const post = async (text, image, userId) => {
   return newPost
 }
 
-export const removePost = async (postId) => {
+export const removePost = async (postId, userId) => {
   const postToDelete = await Post.findById(postId)
   if (!postToDelete) throw new AppError('No post found', 404)
 
-  if (postToDelete.user.toString() !== req.user._id.toString()) {
+  if (postToDelete.user.toString() !== userId.toString()) {
     throw new AppError('You are not authorized', 401)
   }
 
