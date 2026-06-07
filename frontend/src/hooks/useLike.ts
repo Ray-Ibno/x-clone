@@ -46,7 +46,7 @@ const useLike = (postId: string, userId?: string) => {
       return { previousPosts }
     },
 
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       if (context?.previousPosts) {
         queryClient.setQueryData(queryKey, context.previousPosts)
       }
