@@ -7,41 +7,59 @@ import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
 import useAuth from '../features/auth/hooks/useAuth'
 
-const useLike = (postId: string) => {
+const useLike = (postId: string, userId?: string) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
   const { accessToken } = useAuth()
 
+  const queryKey = ['posts', feedType, username]
+
   return useMutation({
     mutationFn: async () => {
-      try {
-        return fetchData<string[]>(`/api/posts/like/${postId}`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      return fetchData<string[]>(`/api/posts/like/${postId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey })
+
+      const previousPosts = queryClient.getQueryData<POST[]>(queryKey)
+
+      queryClient.setQueryData(queryKey, (oldData: POST[]) => {
+        if (!userId) return
+        return oldData?.map((post) => {
+          if (post._id !== postId) return post
+
+          const liked = post.likes.includes(userId)
+          const newLikes = liked
+            ? post.likes.filter((like) => like !== userId)
+            : [...post.likes, userId]
+
+          return { ...post, likes: newLikes }
         })
-      } catch (error) {
-        if (error instanceof Error) {
-          throw error
-        } else {
-          console.error('An unknown error occured')
-        }
+      })
+
+      return { previousPosts }
+    },
+
+    onError: (error, variables, context) => {
+      if (context?.previousPosts) {
+        queryClient.setQueryData(queryKey, context.previousPosts)
       }
+
+      toast.error(error.message)
     },
     onSuccess: (updatedLikes: string[] | undefined) => {
-      if (!updatedLikes) {
-        return console.log('no updated likes received in useLike hook')
-      }
-      queryClient.setQueryData(['posts', feedType, username], (oldData: POST[]) => {
+      if (!updatedLikes) return
+      queryClient.setQueryData(queryKey, (oldData: POST[]) => {
         return oldData?.map((post) =>
           post._id === postId ? { ...post, likes: updatedLikes } : post,
         )
       })
-    },
-    onError: (error) => {
-      toast.error(error.message)
     },
   })
 }

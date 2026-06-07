@@ -26,7 +26,7 @@ type PostProps = {
 const Post = ({ post, priority }: PostProps) => {
   const { data: authUser } = useGetUser()
 
-  const { mutate: likePost, isPending: isLiking } = useLike(post._id)
+  const { mutate: likePost, isPending: isLiking } = useLike(post._id, authUser?._id)
   const { mutate: deletePost, isPending: isDeleting } = useDelete(post._id)
 
   const postOwner = post.user
