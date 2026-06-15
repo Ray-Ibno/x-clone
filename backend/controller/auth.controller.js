@@ -11,7 +11,7 @@ export const signup = async (req, res) => {
     req.body.password,
   )
 
-  const accessToken = generateAccessToken(newUser._id, res)
+  const accessToken = generateAccessToken(newUser._id)
   await generateRefreshToken(newUser._id, res)
 
   res.status(201).json({
@@ -32,7 +32,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const user = await authService.signIn(req.body.email, req.body.password)
 
-  const accessToken = generateAccessToken(user.id, res)
+  const accessToken = generateAccessToken(user.id)
   await generateRefreshToken(user.id, res)
 
   res.status(200).json({
@@ -64,12 +64,14 @@ export const refresh = async (req, res) => {
   if (!cookies?.jwt) throw new AppError('No jwt cookies found', 401)
   const refreshToken = cookies.jwt
 
-  const storedRefreshToken = await redis.get('x-clone-jwt')
-  if (refreshToken !== storedRefreshToken) throw new AppError('Expired token', 403)
-
   const verifiedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-  if (!verifiedRefreshToken) throw new AppError('Invalid token', 403)
 
-  const accessToken = generateAccessToken(verifiedRefreshToken.userId, res)
+  const storedRefreshToken = await redis.sismember(
+    `x-clone-session:${verifiedRefreshToken.userId}`,
+    refreshToken,
+  )
+  if (!storedRefreshToken) throw new AppError('Expired token', 403)
+
+  const accessToken = generateAccessToken(verifiedRefreshToken.userId)
   res.json({ accessToken })
 }
