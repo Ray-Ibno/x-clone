@@ -3,7 +3,7 @@ import { auto as qualityAuto } from '@cloudinary/url-gen/qualifiers/quality'
 import { format } from '@cloudinary/url-gen/actions/delivery'
 import { limitFit } from '@cloudinary/url-gen/actions/resize'
 import { AdvancedImage, lazyload, placeholder } from '@cloudinary/react'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 type PostImgProps = {
   post: {
@@ -12,28 +12,36 @@ type PostImgProps = {
   }
 }
 
-const PostImg = ({ post }: PostImgProps) => {
-  const optimizedPostImg = useMemo(() => {
-    if (!post.imgPublicId) return null
+const cld = new Cloudinary({ cloud: { cloudName: 'ddkmhusml' } })
 
-    const cld = new Cloudinary({ cloud: { cloudName: 'ddkmhusml' } })
+const PostImg = memo(
+  ({ post }: PostImgProps) => {
+    const optimizedPostImg = useMemo(() => {
+      if (!post.imgPublicId) return null
 
-    return cld
-      .image(post.imgPublicId)
-      .delivery(format('auto'))
-      .quality(qualityAuto())
-      .resize(limitFit().width(600))
-  }, [post.imgPublicId])
+      return cld
+        .image(post.imgPublicId)
+        .delivery(format('auto'))
+        .quality(qualityAuto())
+        .resize(limitFit().width(600))
+    }, [post.imgPublicId])
 
-  return optimizedPostImg ? (
-    <AdvancedImage
-      cldImg={optimizedPostImg}
-      plugins={[lazyload({ rootMargin: '10px', threshold: 0.2 }), placeholder({ mode: 'blur' })]}
-      className="h-80 object-contain rounded-lg border border-gray-700 w-full"
-      alt="Post Img"
-    />
-  ) : post.img ? (
-    <img src="" alt="" />
-  ) : null
-}
+    return optimizedPostImg ? (
+      <AdvancedImage
+        cldImg={optimizedPostImg}
+        plugins={[lazyload({ rootMargin: '10px', threshold: 0.2 }), placeholder({ mode: 'blur' })]}
+        className="h-80 object-contain rounded-lg border border-gray-700 w-full"
+        alt="Post Img"
+      />
+    ) : post.img ? (
+      <img src={post.img} alt="Post Content Fallback" />
+    ) : null
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.post.img === nextProps.post.img &&
+      prevProps.post.imgPublicId === nextProps.post.imgPublicId
+    )
+  },
+)
 export default PostImg

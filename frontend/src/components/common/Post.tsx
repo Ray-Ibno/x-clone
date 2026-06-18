@@ -12,7 +12,7 @@ import useDelete from '../../hooks/useDelete'
 import useLike from '../../hooks/useLike'
 import useGetUser from '../../hooks/useGetUser'
 import { formatPostDate } from '../../utils/date'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { preload } from 'react-dom'
 import PostImg from './PostImg'
 
@@ -36,10 +36,6 @@ const Post = ({ post, priority }: PostProps) => {
 
   const formattedDate = formatPostDate(post.createdAt)
 
-  if (post.img && priority === 'high') {
-    preload(post.img, { as: 'image', fetchPriority: 'high' })
-  }
-
   const handleDeletePost = () => {
     deletePost()
   }
@@ -48,6 +44,12 @@ const Post = ({ post, priority }: PostProps) => {
     if (isLiking) return //prevents handleLikePost from running while isliking is true
     likePost()
   }
+
+  useEffect(() => {
+    if (post.img && priority === 'high') {
+      preload(post.img, { as: 'image', fetchPriority: 'high' })
+    }
+  }, [post.img, priority])
 
   return (
     <>
