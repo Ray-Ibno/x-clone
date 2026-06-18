@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import toast from 'react-hot-toast'
-import fetchData from '../../../utils/api/fetchData'
+
 import type { User } from '../../../types/user-model'
-import useAuth from './useAuth'
+import { customFetch } from '../../../utils/api'
 
 type RequestData = {
   email: string
@@ -15,12 +15,11 @@ type RequestData = {
 
 const useSignUp = (requestData: RequestData) => {
   const queryClient = useQueryClient()
-  const { signup } = useAuth()
 
   return useMutation({
     mutationFn: async () => {
       try {
-        const data = await fetchData<User>('/api/auth/signup', {
+        const response = await customFetch('/api/auth/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -28,7 +27,13 @@ const useSignUp = (requestData: RequestData) => {
           body: JSON.stringify(requestData),
         })
 
-        signup(data.accessToken)
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+
+        return data as User
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

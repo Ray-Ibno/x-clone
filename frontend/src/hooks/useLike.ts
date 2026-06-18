@@ -1,28 +1,41 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { POST } from '../types/post-model'
 import toast from 'react-hot-toast'
-import fetchData from '../utils/api/fetchData'
+
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
-import useAuth from '../features/auth/hooks/useAuth'
+import { customFetch } from '../utils/api'
 
 const useLike = (postId: string, userId?: string) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
-  const { accessToken } = useAuth()
 
   const queryKey = ['posts', feedType, username]
 
   return useMutation({
     mutationFn: async () => {
-      return fetchData<string[]>(`/api/posts/like/${postId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      try {
+        const response = await customFetch(`/api/posts/like/${postId}`, {
+          method: 'POST',
+        })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+
+        return data as string[]
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Fetch Error:', error.message)
+          throw error
+        } else {
+          console.error('An unknown error occured')
+        }
+      }
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey })

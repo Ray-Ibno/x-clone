@@ -1,21 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
-import fetchData from '../../../utils/api/fetchData'
 import type { User } from '../../../types/user-model'
-import useAuth from '../../auth/hooks/useAuth'
+import { customFetch } from '../../../utils/api'
 
 const useGetUserProfile = (username?: string) => {
-  const { accessToken } = useAuth()
-
   return useQuery({
     queryKey: ['userProfile', username],
     queryFn: async () => {
       try {
-        return fetchData<User>(`/api/users/profile/${username}`, {
+        const response = await customFetch(`/api/users/profile/${username}`, {
           method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+        return data as User
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

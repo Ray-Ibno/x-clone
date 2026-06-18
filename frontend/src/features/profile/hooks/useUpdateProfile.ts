@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import toast from 'react-hot-toast'
-import fetchData from '../../../utils/api/fetchData'
-import useAuth from '../../auth/hooks/useAuth'
+import { customFetch } from '../../../utils/api'
 
 type UpdateData = {
   username?: string
@@ -15,20 +14,24 @@ type UpdateData = {
 }
 
 const useUpdateProfile = (updateData: UpdateData) => {
-  const { accessToken } = useAuth()
-
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        return fetchData<UpdateData>('/api/users/update', {
+        const response = await customFetch('/api/users/update', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(updateData),
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+        return data as UpdateData
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

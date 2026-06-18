@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import fetchData from '../utils/api/fetchData'
+
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
-import useAuth from '../features/auth/hooks/useAuth'
+
+import { customFetch } from '../utils/api'
 
 const useGetPosts = () => {
-  const { accessToken } = useAuth()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
   const getPostEndpoint = () => {
@@ -31,13 +31,20 @@ const useGetPosts = () => {
     queryKey: ['posts', feedType, username],
     queryFn: async () => {
       try {
-        return fetchData<POST[]>(endpoint, {
+        const response = await customFetch(endpoint, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+
+        return data as POST[]
       } catch (error) {
         if (error instanceof Error) {
           console.error('Fetching Error: ', error.message)
@@ -46,7 +53,6 @@ const useGetPosts = () => {
         }
       }
     },
-    enabled: !!accessToken,
     retry: false,
   })
 }

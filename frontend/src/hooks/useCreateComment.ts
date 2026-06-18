@@ -1,30 +1,33 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import fetchData from '../utils/api/fetchData'
 import toast from 'react-hot-toast'
 import type { POST } from '../types/post-model'
 import { useParams } from 'react-router-dom'
 import { useContext } from 'react'
 import { feedTypeContext } from '../context/feedTypeContext'
-import useAuth from '../features/auth/hooks/useAuth'
+import { customFetch } from '../utils/api'
 
 const useCreateComment = (postId: string, text: string, success: () => void) => {
   const queryClient = useQueryClient()
   const { username } = useParams()
   const feedType = useContext(feedTypeContext)
 
-  const { accessToken } = useAuth()
-
   return useMutation({
     mutationFn: async () => {
       try {
-        return fetchData<POST['comments']>(`/api/posts/comment/${postId}`, {
+        const response = await customFetch(`/api/posts/comment/${postId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({ text }),
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+        return data as POST['comments']
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

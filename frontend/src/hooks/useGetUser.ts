@@ -1,27 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
 import type { User } from '../types/user-model'
-import useAuth from '../features/auth/hooks/useAuth'
+import { customFetch } from '../utils/api'
 
 const useGetUser = () => {
-  const { accessToken } = useAuth()
-
   return useQuery({
-    queryKey: ['authUser', accessToken],
+    queryKey: ['authUser'],
     queryFn: async () => {
       try {
-        const res = await fetch('/api/auth/user', {
+        const response = await customFetch('/api/auth/user', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         })
 
-        if (!res.ok) {
-          throw new Error(res.status.toString())
+        if (!response.ok) {
+          throw new Error(response.status.toString())
         }
 
-        const data = await res.json()
+        const data = await response.json()
 
         return data as User
       } catch (error) {
@@ -33,7 +30,6 @@ const useGetUser = () => {
         }
       }
     },
-    enabled: !!accessToken,
     retry: false,
     staleTime: Infinity,
   })

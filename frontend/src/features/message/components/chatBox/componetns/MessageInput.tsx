@@ -3,7 +3,7 @@ import { useChatActions, useChatStore } from '../../../store/useChatStore'
 import { BiSend, BiX } from 'react-icons/bi'
 import { IoImage } from 'react-icons/io5'
 import toast from 'react-hot-toast'
-import useAuth from '../../../../auth/hooks/useAuth'
+import { useAuthStore } from '../../../../../store/authStore'
 
 const MessageInput = () => {
   const [text, setText] = useState('')
@@ -13,7 +13,7 @@ const MessageInput = () => {
   const { selectedUser } = useChatStore()
   const { sendMessage } = useChatActions()
 
-  const { accessToken } = useAuth()
+  const { accessToken } = useAuthStore()
 
   const handleImgChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files

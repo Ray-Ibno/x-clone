@@ -1,22 +1,27 @@
 import { useQuery } from '@tanstack/react-query'
-import fetchData from '../utils/api/fetchData'
+
 import type { User } from '../types/user-model'
-import useAuth from '../features/auth/hooks/useAuth'
+import { customFetch } from '../utils/api'
 
 const useGetSuggestedUsers = () => {
-  const { accessToken } = useAuth()
-
   return useQuery({
-    queryKey: ['suggestedUsers', accessToken],
+    queryKey: ['suggestedUsers'],
     queryFn: async () => {
       try {
-        return fetchData<User[]>('/api/users/suggested', {
+        const response = await customFetch('/api/users/suggested', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+
+        return data as User[]
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
@@ -25,7 +30,7 @@ const useGetSuggestedUsers = () => {
         }
       }
     },
-    enabled: !!accessToken,
+
     retry: false,
   })
 }

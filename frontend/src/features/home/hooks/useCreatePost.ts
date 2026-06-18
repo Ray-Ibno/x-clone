@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import fetchData from '../../.././utils/api/fetchData'
 import type { POST } from '../../../types/post-model'
-import useAuth from '../../auth/hooks/useAuth'
+import { customFetch } from '../../../utils/api'
 
 type PostData = {
   text: string
@@ -12,19 +11,25 @@ type PostData = {
 
 const useCreatePost = () => {
   const queryClient = useQueryClient()
-  const { accessToken } = useAuth()
 
   return useMutation({
     mutationFn: async (postData: PostData) => {
       try {
-        return fetchData<POST>('/api/posts/create', {
+        const response = await customFetch('/api/posts/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(postData),
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+
+        return data as POST
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

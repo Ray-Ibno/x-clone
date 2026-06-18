@@ -8,10 +8,21 @@ export const authenticateUser = async (req, res, next) => {
 
   const accessToken = authHeader.split(' ')[1]
 
-  const verifiedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-  if (!verifiedToken) throw new AppError('You are not authenticated', 401)
+  try {
+    const verifiedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
 
-  const user = await User.findById(verifiedToken.userId).select('-password')
-  req.user = user
-  next()
+    const user = await User.findById(verifiedToken.userId).select('-password')
+    req.user = user
+    next()
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw new AppError('Your token has expired. Please log in again.', 401)
+    }
+
+    if (error.name === 'JsonWebTokenError') {
+      throw new AppError('Invalid token. Access denied.', 401)
+    }
+
+    throw new AppError('Authentication failed.', 401)
+  }
 }

@@ -5,12 +5,12 @@ import FilterBtns from './components/FilterBtns'
 import Header from './components/Header'
 import ContactSkeleton from './skeletons/ContactSkeleton'
 import { useParams } from 'react-router-dom'
-import useAuth from '../../../auth/hooks/useAuth'
+import { useAuthStore } from '../../../../store/authStore'
 
 const Contacts = () => {
   const { isChatLoading, userFromProfilePage, selectedUser } = useChatStore()
   const { getUserFromProfilePage, setSelectedUser, getChats } = useChatActions()
-  const { accessToken } = useAuth()
+  const { accessToken } = useAuthStore()
 
   const { id } = useParams()
 

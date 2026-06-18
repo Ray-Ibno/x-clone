@@ -17,6 +17,7 @@ import LoginPage from './pages/auth/login/LoginPage'
 import SignUpPage from './pages/auth/signup/SignUpPage'
 import PublicRoute from './PublicRoute'
 import ProtectedRoute from './ProtectedRoute'
+import NotFoundPage from './pages/404'
 
 const NotificationPage = lazy(() => import('./pages/notification/NotificationPage'))
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'))
@@ -46,6 +47,8 @@ function App() {
             <Route path="/chat/:id?" element={<LazyRoute component={ChatPage} />} />
             <Route path="/profile/:username" element={<LazyRoute component={ProfilePage} />} />
           </Route>
+
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
         {authUser && !/^\/chat(\/[^/]+)?\/?$/.test(location.pathname) && <RightPanel />}

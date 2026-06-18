@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import fetchData from '../utils/api/fetchData'
-import useAuth from '../features/auth/hooks/useAuth'
+import { customFetch } from '../utils/api'
 
 interface ApiResponse {
   status: 'success' | 'error'
@@ -12,18 +11,23 @@ interface ApiResponse {
 }
 
 const useFollow = (id: string | undefined) => {
-  const { accessToken } = useAuth()
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
       try {
-        return fetchData<ApiResponse>(`/api/users/follow/${id}`, {
+        const response = await customFetch(`/api/users/follow/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         })
+
+        if (!response.ok) {
+          throw new Error(response.status.toString())
+        }
+
+        const data = await response.json()
+        return data as ApiResponse
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)

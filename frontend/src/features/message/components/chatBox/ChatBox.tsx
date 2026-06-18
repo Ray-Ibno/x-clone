@@ -4,12 +4,12 @@ import Header from './componetns/Header'
 import ChatInfo from './componetns/ChatInfo'
 import MessageInput from './componetns/MessageInput'
 import Conversation from './componetns/Conversation'
-import useAuth from '../../../auth/hooks/useAuth'
+import { useAuthStore } from '../../../../store/authStore'
 
 const ChatBox = () => {
   const { selectedUser } = useChatStore()
   const { getMessages } = useChatActions()
-  const { accessToken } = useAuth()
+  const { accessToken } = useAuthStore()
 
   useEffect(() => {
     if (selectedUser && accessToken) {
