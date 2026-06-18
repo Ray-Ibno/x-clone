@@ -39,8 +39,6 @@ export const customFetch = async (url: string, options: FetchOptions = {}) => {
 
         headers['Authorization'] = `Bearer ${newToken}`
         response = await fetch(url, { ...config, headers })
-
-        console.log('token refreshed')
       } else {
         setAccessToken(null)
       }
