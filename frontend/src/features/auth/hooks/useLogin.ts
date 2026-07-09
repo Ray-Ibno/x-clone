@@ -24,7 +24,8 @@ const useLogin = (requestData: requestData) => {
         })
 
         if (!response.ok) {
-          throw new Error(response.status.toString())
+          const errorData = await response.json()
+          throw new Error(errorData.message)
         }
 
         const data = await response.json()
