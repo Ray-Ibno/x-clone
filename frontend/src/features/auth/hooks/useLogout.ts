@@ -15,7 +15,8 @@ const useLogout = () => {
         })
 
         if (!response.ok) {
-          throw new Error(response.status.toString())
+          const errorData = await response.json()
+          throw new Error(errorData.message)
         }
       } catch (error) {
         if (error instanceof Error) {
