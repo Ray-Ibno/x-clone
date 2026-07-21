@@ -11,18 +11,14 @@ const SEVEN_DAYS = 604800
 
 export const findUser = async (id) => {
   const key = `user-profile:${id}`
-  const cached = await userCache.getUser(key)
 
+  const cached = await safeAwait(userCache.getUser(key))
   if (cached) return cached
 
   const user = await userDB.findById(id)
   if (!user) throw new AppError('No user found', 404)
 
-  try {
-    await userCache.setUser(key, user)
-  } catch (error) {
-    onsole.error('Cache syncronization failed: ', cacheError.message)
-  }
+  safeAwait(userCache.setUser(key, user))
 
   return user
 }
@@ -53,14 +49,12 @@ export const register = async ({ username, fullName, email, password }) => {
 
   const sessionPayload = { user_id: newUser._id, loggedInAt: new Date() }
 
-  try {
-    await Promise.all([
+  safeAwait(
+    Promise.all([
       tokenCache.setSession(sessionKey, sessionPayload, SEVEN_DAYS),
       tokenCache.setSession(trackerKey, 'active', SEVEN_DAYS),
-    ])
-  } catch (cacheError) {
-    console.error('Cache syncronization failed: ', cacheError.message)
-  }
+    ]),
+  )
 
   const dbTokenExp = new Date(Date.now() + SEVEN_DAYS * 1000)
   await tokenDB.addDbToken(newUser._id, newRefreshToken, dbTokenExp)
@@ -83,14 +77,12 @@ export const signIn = async ({ email, password }) => {
 
   const sessionPayload = { user_id: user._id, loggedInAt: new Date() }
 
-  try {
-    await Promise.all([
+  safeAwait(
+    Promise.all([
       tokenCache.setSession(sessionKey, sessionPayload, SEVEN_DAYS),
       tokenCache.setSession(trackerKey, 'active', SEVEN_DAYS),
-    ])
-  } catch (error) {
-    console.error('Cache syncronization failed: ', cacheError.message)
-  }
+    ]),
+  )
 
   const dbTokenExp = new Date(Date.now() + SEVEN_DAYS * 1000)
   await tokenDB.addDbToken(user._id, newRefreshToken, dbTokenExp)
@@ -107,7 +99,9 @@ export const handleRefreshToken = async (refreshToken, res) => {
   const sessionKey = `x-clone-session:${refreshToken}`
   const trackerKey = `user:${decoded.userId}:session:${refreshToken}`
 
-  const sessionExists = await tokenCache.getSession(sessionKey)
+  let sessionExists
+
+  safeAwait((sessionExists = await tokenCache.getSession(sessionKey)))
 
   if (!sessionExists) {
     console.error('Cache check failed. Checking token directly from the database...')
@@ -126,20 +120,18 @@ export const handleRefreshToken = async (refreshToken, res) => {
   const newAccessToken = generateAccessToken(decoded.userId)
   const newRefreshToken = generateRefreshToken(decoded.userId)
 
-  try {
-    const newSessionKey = `x-clone-session:${newRefreshToken}`
-    const newTrackerKey = `user:${decoded.userId}:session:${newRefreshToken}`
+  const newSessionKey = `x-clone-session:${newRefreshToken}`
+  const newTrackerKey = `user:${decoded.userId}:session:${newRefreshToken}`
 
-    const sessionPayload = { user_id: decoded.userId, loggedInAt: new Date() }
+  const sessionPayload = { user_id: decoded.userId, loggedInAt: new Date() }
 
-    await Promise.all([
+  safeAwait(
+    Promise.all([
       tokenCache.deleteSession(sessionKey, trackerKey),
       tokenCache.setSession(newSessionKey, sessionPayload, decoded.exp),
       tokenCache.setSession(newTrackerKey, 'active', decoded.exp),
-    ])
-  } catch (error) {
-    console.error('Cache syncronization failed: ', cacheError.message)
-  }
+    ]),
+  )
 
   const result = await tokenDB.updateDbToken(decoded, refreshToken, newRefreshToken)
   if (result.modifiedCount === 0) {
@@ -151,17 +143,14 @@ export const handleRefreshToken = async (refreshToken, res) => {
 }
 
 export const deleteTokenAndSession = async (userId, refreshToken) => {
-  tokenDB.deleteDbToken(userId, refreshToken)
+  const sessionKey = `x-clone-session:${refreshToken}`
+  const trackerKey = `user:${userId}:session:${refreshToken}`
 
-  try {
-    const sessionKey = `x-clone-session:${refreshToken}`
-    const trackerKey = `user:${userId}:session:${refreshToken}`
+  await tokenDB.deleteDbToken(userId, refreshToken)
 
-    await tokenCache.deleteSession(sessionKey, trackerKey)
-  } catch (error) {
-    console.error(
-      `[CRITICAL SECURITY WARNING]: Failed to clear Redis cache on logout for user ${userId}. ` +
-        `Session will remain active in cache until TTL expires. Error: ${cacheError.message}`,
-    )
-  }
+  await safeAwait(
+    tokenCache.deleteSession(sessionKey, trackerKey),
+    `[CRITICAL SECURITY WARNING]: Failed to clear Redis cache on logout for user ${userId}. ` +
+      `Session will remain active in cache until TTL expires. Error: ${error.message}`,
+  )
 }

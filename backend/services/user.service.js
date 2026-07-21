@@ -1,115 +1,106 @@
 import AppError from '../errors/AppError.js'
-import Notification from '../models/notification.model.js'
-import User from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
-
-import cloudinary from '../config/cloudinary.js'
+import { userDB } from '../repositories/userDB.repository.js'
+import { notificationDB } from '../repositories/notificationDB.repository.js'
+import { cloudinaryUploader } from '../repositories/cloudinary.repository.js'
+import { userCache } from '../repositories/userCache.repository.js'
 
 export const fetchUserDetails = async (username) => {
-  //GET CACHED HERE
-  const user = await User.findOne({ username })
+  const key = `${username}:details`
+
+  const cached = await safeAwait(userCache.getKey(key))
+  if (cached) return cached
+
+  const user = await userDB.findOne({ username })
   if (!user) throw new AppError('No user found', 404)
+
+  safeAwait(userCache.setKey(key, user))
 
   return user
 }
 
 export const fetchSuggestedUsers = async (userId) => {
-  //GET CAHCED HERE
-  const suggestedUsers = await User.findSuggestedUsers(userId, 5)
+  const key = `suggested_users:${userId}`
+
+  const cached = await safeAwait(userCache.getKey(key))
+  if (cached) return cached
+
+  const suggestedUsers = await userDB.findSuggestedUsers(userId, 5)
+
+  safeAwait(userCache.setKey(key, suggestedUsers))
+
   return suggestedUsers
 }
 
 export const changeFollowStatus = async (targetUserId, currentUserId) => {
-  if (currentUserId === targetUserId)
+  if (currentUserId === targetUserId) {
     throw new AppError('You cannot follow or unfollow yourself', 404)
-
-  const userToFollowUnfollow = await User.findById(targetUserId)
-  const currentUser = await User.findById(currentUserId)
-
-  if (!currentUser || !userToFollowUnfollow) throw new AppError('User not found', 404)
-
-  if (currentUser.following.includes(targetUserId)) {
-    //unfollow
-    await User.findByIdAndUpdate(currentUserId, { $pull: { following: targetUserId } })
-    await User.findByIdAndUpdate(id, { $pull: { followers: currentUserId } })
-    return { message: `You unfollowed ${userToFollowUnfollow.username}` }
-  } else {
-    //follow
-    await User.findByIdAndUpdate(currentUserId, { $push: { following: targetUserId } })
-    await User.findByIdAndUpdate(targetUserId, { $push: { followers: currentUserId } })
-
-    const notification = new Notification({
-      to: userToFollowUnfollow._id,
-      from: currentUser._id,
-      type: 'follow',
-    })
-
-    await notification.save()
-    //DELETE REDIS CACHE HERE
-    return { message: `You followed ${userToFollowUnfollow.username}` }
   }
+
+  const { isFollowing, targetUser } = userDB.toggleFollow(currentUserId, targetUserId)
+
+  if (!targetUser) throw new AppError('User not found', 404)
+  if (isFollowing) safeAwait(notificationDB.newNotification('follow', currentUserId, targetUserId))
+
+  safeAwait(userCache.deleteKey(`${userToFollowUnfollow.username}:details`))
+
+  return { isFollowing, username: targetUser.username }
 }
 
-export const updateProfile = async (
-  userId,
-  username,
-  fullName,
-  email,
-  currentPassword,
-  newPassword,
-  bio,
-  link,
-  profileImg,
-  coverImg,
-) => {
-  let profileImage = profileImg
-  let coverImage = coverImg
+export const updateProfile = async (userId, bodyData) => {
+  let profileImage = bodyData.profileImg
+  let coverImage = bodyData.coverImg
 
-  let user = await User.findById(userId)
-  if (!user) throw new AppError('No user found', 404)
+  let userToUpdate = await userDB.findById(id)
+  if (!userToUpdate) throw new AppError('No user found', 404)
 
-  if ((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
+  if (
+    (!bodyData.currentPassword && bodyData.newPassword) ||
+    (bodyData.currentPassword && !bodyData.newPassword)
+  ) {
     throw new AppError('Please provide both current password and new password')
   }
 
-  if (currentPassword && newPassword) {
-    const isPasswordMatched = await bcrypt.compare(currentPassword, user.password)
+  if (bodyData.currentPassword && bodyData.newPassword) {
+    const isPasswordMatched = await bcrypt.compare(bodyData.currentPassword, userToUpdate.password)
 
     if (!isPasswordMatched) throw new AppError('Please provide the correct current password', 400)
 
     const salt = 10
-    const hashedPassword = await bcrypt.hash(newPassword, salt)
+    const hashedPassword = await bcrypt.hash(bodyData.newPassword, salt)
 
-    user.password = hashedPassword
+    userToUpdate.password = hashedPassword
   }
 
   if (profileImage) {
-    if (user.profileImg) {
-      await cloudinary.uploader.destroy(user.profileImg.split('/').pop().split('.')[0])
+    if (userToUpdate.profileImg) {
+      await cloudinaryUploader.destroy(userToUpdate.profileImg)
     }
-    const response = await cloudinary.uploader.upload(profileImage)
+    const response = await cloudinaryUploader.upload(profileImage)
     profileImage = response.secure_url
   }
 
   if (coverImage) {
-    if (user.coverImg) {
-      await cloudinary.uploader.destroy(user.coverImg.split('/').pop().split('.')[0])
+    if (userToUpdate.coverImg) {
+      await cloudinaryUploader.destroy(userToUpdate.coverImg)
     }
-    const response = await cloudinary.uploader.upload(coverImage)
+    const response = await cloudinaryUploader.upload(coverImage)
     coverImage = response.secure_url
   }
 
-  user.username = username || user.username
-  user.fullName = fullName || user.fullName
-  user.email = email || user.email
-  user.bio = bio || user.bio
-  user.link = link || user.link
-  user.profileImg = profileImage || user.profileImg
-  user.coverImg = coverImage || user.coverImg
+  userToUpdate.username = bodyData.username || userToUpdate.username
+  userToUpdate.fullName = bodyData.fullName || userToUpdate.fullName
+  userToUpdate.email = bodyData.email || userToUpdate.email
+  userToUpdate.bio = bodyData.bio || userToUpdate.bio
+  userToUpdate.link = bodyData.link || userToUpdate.link
+  userToUpdate.profileImg = profileImage || userToUpdate.profileImg
+  userToUpdate.coverImg = coverImage || userToUpdate.coverImg
 
-  user = await user.save()
+  userToUpdate = await userToUpdate.save()
 
-  user.password = null //removed for the client response as a security mesure
-  //DELETE REDIS CACHE HERE
-  return user
+  userToUpdate.password = null //removed for the client response as a security mesure
+
+  safeAwait(userCache.deleteKey(`${userId}:profile`))
+
+  return userToUpdate
 }

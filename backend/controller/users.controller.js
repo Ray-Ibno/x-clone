@@ -11,23 +11,14 @@ export const getSuggestedUsers = async (req, res) => {
 }
 
 export const followUnfollow = async (req, res) => {
-  const message = await userService.changeFollowStatus(req.params.id, req.user._id)
-  res.status(200).json(message)
+  const { isFollowing, username } = await userService.changeFollowStatus(
+    req.params.id,
+    req.user._id,
+  )
+  res.status(200).json({ message: `You ${isFollowing ? 'followed' : 'unfollowed'} ${username}` })
 }
 
 export const updateUserProfile = async (req, res) => {
-  const user = await userService.updateProfile(
-    req.user.id,
-    req.body.username,
-    req.body.fullName,
-    req.body.email,
-    req.body.currentPassword,
-    req.body.newPassword,
-    req.body.bio,
-    req.body.link,
-    req.body.profileImg,
-    req.body.coverImg,
-  )
-
+  const user = await userService.updateProfile(req.user.id, req.body)
   res.status(200).json(user)
 }
