@@ -29,7 +29,7 @@ const useLogin = (requestData: requestData) => {
         }
 
         const data = await response.json()
-        setAccessToken(data)
+        setAccessToken(data.accessToken)
       } catch (error) {
         if (error instanceof Error) {
           console.error(error)
