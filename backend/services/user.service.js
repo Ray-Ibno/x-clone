@@ -6,13 +6,15 @@ import bcrypt from 'bcryptjs'
 import cloudinary from '../config/cloudinary.js'
 
 export const fetchUserDetails = async (username) => {
-  const user = await User.findOne({ username }).select('-password')
+  //GET CACHED HERE
+  const user = await User.findOne({ username })
   if (!user) throw new AppError('No user found', 404)
 
   return user
 }
 
 export const fetchSuggestedUsers = async (userId) => {
+  //GET CAHCED HERE
   const suggestedUsers = await User.findSuggestedUsers(userId, 5)
   return suggestedUsers
 }
@@ -43,7 +45,7 @@ export const changeFollowStatus = async (targetUserId, currentUserId) => {
     })
 
     await notification.save()
-
+    //DELETE REDIS CACHE HERE
     return { message: `You followed ${userToFollowUnfollow.username}` }
   }
 }
@@ -108,5 +110,6 @@ export const updateProfile = async (
   user = await user.save()
 
   user.password = null //removed for the client response as a security mesure
+  //DELETE REDIS CACHE HERE
   return user
 }

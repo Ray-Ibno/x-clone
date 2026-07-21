@@ -6,6 +6,7 @@ import User from '../models/user.model.js'
 import cloudinary from '../config/cloudinary.js'
 
 export const fetchPosts = async () => {
+  //GET CACHED POSTS HERE
   const posts = await Post.find({})
     .sort({ createdAt: -1 })
     .populate([
@@ -13,11 +14,12 @@ export const fetchPosts = async () => {
       { path: 'comments', populate: { path: 'user', select: '-password' } },
     ])
     .exec()
-
+  //SET POSTS HERE
   return posts
 }
 
 export const fetchLikedPosts = async (username) => {
+  //GET LIKED POSTS IN CACHED POSTS HERE
   const user = await User.findOne({ username })
   if (!user) throw new AppError('No user found', 404)
 
@@ -95,7 +97,7 @@ export const removePost = async (postId, userId) => {
     const imgId = postToDelete.img.split('/').pop().split('.')[0]
     await cloudinary.uploader.destroy(imgId)
   }
-
+  //DELETE POSTS CACHE HERE
   await Post.findByIdAndDelete(postId)
 }
 
@@ -115,7 +117,7 @@ export const postComment = async (text, postId, userId) => {
     { path: 'user', select: '-password' },
     { path: 'comments', populate: { path: 'user', select: '-password' } },
   ])
-
+  //DELETE POSTS CACHE HERE
   return updatedPost
 }
 
@@ -151,6 +153,7 @@ export const postReact = async (userId, postId) => {
     })
 
     await notification.save()
+    //DELETE POSTS CACHE HERE
     return updatedPost
   }
 }

@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 import AppError from '../errors/AppError.js'
 
 const userSchema = new mongoose.Schema(
@@ -26,37 +26,28 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        default: [],
       },
     ],
     following: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        default: [],
       },
     ],
-    profileImg: {
-      type: String,
-      default: '',
-    },
-    coverImg: {
-      type: String,
-      default: '',
-    },
-    bio: {
-      type: String,
-      default: '',
-    },
-    link: {
-      type: String,
-      default: '',
-    },
+    profileImg: String,
+    coverImg: String,
+    bio: String,
+    link: String,
     likedPosts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
-        default: [],
+      },
+    ],
+    refreshTokens: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RefreshToken',
       },
     ],
   },
@@ -93,6 +84,14 @@ userSchema.statics.findSuggestedUsers = async function (userId, limit) {
   ])
   return suggestedUsers
 }
+
+userSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    delete ret.password
+    delete ret.refreshTokens
+    return ret
+  },
+})
 
 const User = mongoose.model('User', userSchema)
 
