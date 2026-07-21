@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import type { User } from '../../../types/user-model'
 import { customFetch } from '../../../utils/api'
+import { useAuthStore } from '../../../store/authStore'
 
 type RequestData = {
   email: string
@@ -15,6 +16,7 @@ type RequestData = {
 
 const useSignUp = (requestData: RequestData) => {
   const queryClient = useQueryClient()
+  const { setAccessToken } = useAuthStore()
 
   return useMutation({
     mutationFn: async () => {
@@ -33,6 +35,7 @@ const useSignUp = (requestData: RequestData) => {
         }
 
         const data = await response.json()
+        setAccessToken(data.accessToken)
 
         return data as User
       } catch (error) {
