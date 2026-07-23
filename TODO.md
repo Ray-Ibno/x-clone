@@ -9,6 +9,7 @@ Planning to make this web app a complete app in the future, including complex fe
 - [ ] Write unit tests
 - [x] Fix bug where if you go to /chat from /chat/userid, the contacusers do not show
 - [ ] When sending a message to someone for the first time, it should show up in real time
+- [ ] If an account is deleted, all the notificatification that relies on populated data will return null, causing a bug in the frontend
 
 ## Low Priority
 
