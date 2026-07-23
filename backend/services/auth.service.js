@@ -6,19 +6,20 @@ import { tokenCache } from '../repositories/tokenCache.repository.js'
 import { tokenDB } from '../repositories/tokenDB.repository.js'
 import { userDB } from '../repositories/userDB.repository.js'
 import { userCache } from '../repositories/userCache.repository.js'
+import { safeAwait } from '../helpers/cache.helper.js'
 
 const SEVEN_DAYS = 604800
 
 export const findUser = async (id) => {
   const key = `user-profile:${id}`
 
-  const cached = await safeAwait(userCache.getUser(key))
+  const cached = await safeAwait(userCache.getKey(key))
   if (cached) return cached
 
   const user = await userDB.findById(id)
   if (!user) throw new AppError('No user found', 404)
 
-  safeAwait(userCache.setUser(key, user))
+  safeAwait(userCache.setKey(key, user))
 
   return user
 }
@@ -99,9 +100,7 @@ export const handleRefreshToken = async (refreshToken, res) => {
   const sessionKey = `x-clone-session:${refreshToken}`
   const trackerKey = `user:${decoded.userId}:session:${refreshToken}`
 
-  let sessionExists
-
-  safeAwait((sessionExists = await tokenCache.getSession(sessionKey)))
+  const sessionExists = await safeAwait(tokenCache.getSession(sessionKey))
 
   if (!sessionExists) {
     console.error('Cache check failed. Checking token directly from the database...')
@@ -151,6 +150,6 @@ export const deleteTokenAndSession = async (userId, refreshToken) => {
   await safeAwait(
     tokenCache.deleteSession(sessionKey, trackerKey),
     `[CRITICAL SECURITY WARNING]: Failed to clear Redis cache on logout for user ${userId}. ` +
-      `Session will remain active in cache until TTL expires. Error: ${error.message}`,
+      `Session will remain active in cache until TTL expires. `,
   )
 }

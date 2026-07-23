@@ -4,9 +4,10 @@ import { userDB } from '../repositories/userDB.repository.js'
 import { notificationDB } from '../repositories/notificationDB.repository.js'
 import { cloudinaryUploader } from '../repositories/cloudinary.repository.js'
 import { userCache } from '../repositories/userCache.repository.js'
+import { safeAwait } from '../helpers/cache.helper.js'
 
 export const fetchUserDetails = async (username) => {
-  const key = `${username}:details`
+  const key = `user-details:${username}`
 
   const cached = await safeAwait(userCache.getKey(key))
   if (cached) return cached
@@ -37,12 +38,13 @@ export const changeFollowStatus = async (targetUserId, currentUserId) => {
     throw new AppError('You cannot follow or unfollow yourself', 404)
   }
 
-  const { isFollowing, targetUser } = userDB.toggleFollow(currentUserId, targetUserId)
+  const { isFollowing, targetUser } = await userDB.toggleFollow(currentUserId, targetUserId)
 
   if (!targetUser) throw new AppError('User not found', 404)
   if (isFollowing) safeAwait(notificationDB.newNotification('follow', currentUserId, targetUserId))
 
-  safeAwait(userCache.deleteKey(`${userToFollowUnfollow.username}:details`))
+  safeAwait(userCache.deleteKey(`user-details:${targetUser.username}`))
+  safeAwait(userCache.deleteKey(`user-profile:${currentUserId}`))
 
   return { isFollowing, username: targetUser.username }
 }

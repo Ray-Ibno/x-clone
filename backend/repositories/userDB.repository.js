@@ -32,7 +32,7 @@ export const userDB = {
       {
         $set: {
           following: {
-            $con: {
+            $cond: {
               if: { $in: [targetUserObjId, '$following'] },
               then: {
                 $filter: { input: '$following', cond: { $ne: ['$$this', targetUserObjId] } },
@@ -46,11 +46,11 @@ export const userDB = {
 
     if (!updatedUser) return { isFollowing: false, targetUser: null }
 
-    const wasFollowing = updatedUser.following.includes(targetUserObjId)
+    const wasFollowing = updatedUser.following.map((id) => id.toString()).includes(targetUserId)
     const isFollowing = !wasFollowing
 
     const targetUser = await User.findOneAndUpdate(
-      { _id: targetUserObjId },
+      { _id: targetUserId },
       isFollowing ? { $addToSet: { followers: userId } } : { $pull: { followers: userId } },
       { new: true, select: 'username' },
     )

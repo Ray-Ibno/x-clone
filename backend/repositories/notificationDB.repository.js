@@ -1,4 +1,4 @@
-import Notification from '../models/notification.model'
+import Notification from '../models/notification.model.js'
 
 export const notificationDB = {
   newNotification(type, userId, targetUserId) {
