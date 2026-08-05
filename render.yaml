@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: x-clone
+    runtime: docker
+    repo: https://github.com/Ray-Ibno/x-clone
+    plan: free
