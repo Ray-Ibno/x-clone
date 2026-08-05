@@ -12,11 +12,13 @@ const cspConfiguration = (req, res, next) => {
       objectSrc: ["'none'"],
       scriptSrc: [
         (req, res) => `'nonce-${res.locals.nonce}'`,
+        "'self'",
         "'strict-dynamic'",
         "'unsafe-inline'",
         'https:',
         'http',
       ],
+      'script-src-elem': ["'self'", "'unsafe-inline'", 'http://localhost:5100'],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
       imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com'],

@@ -1,7 +1,7 @@
 {
   "name": "x-clone",
   "version": "1.0.0",
-  "description": "",
+  "description": "A clone of X for a portfolio project",
   "main": "./backend/server.js",
   "type": "module",
   "scripts": {
@@ -10,9 +10,10 @@
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alradenn Ibno",
   "license": "ISC",
   "dependencies": {
+    "mongoose": "^8.19.2",
     "@upstash/redis": "^1.38.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.8.0",
@@ -24,8 +25,5 @@
     "jsonwebtoken": "^9.0.2",
     "socket.io": "^4.8.3",
     "zod": "^4.3.6"
-  },
-  "devDependencies": {
-    "mongoose": "^8.19.2"
   }
 }
