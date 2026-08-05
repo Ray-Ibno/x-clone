@@ -12,6 +12,7 @@ import messageRoute from './routes/message.route.js'
 
 import { globalErrorHandler } from './middleware/globalErrorHandler.js'
 import securityMiddleware from './middleware/security.js'
+import { fileURLToPath } from 'url'
 
 const __dirname = path.resolve()
 
@@ -26,13 +27,16 @@ app.use('/api/notifications', notificationRoute)
 app.use('/api/messages', messageRoute)
 
 if (process.env.NODE_ENV === 'production') {
-  const distPath = path.resolve(__dirname, 'frontend', 'dist')
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
+
+  const distPath = path.resolve(__dirname, '..', 'frontend', 'dist')
 
   // Serve the compiled frontend assets folder
-  app.use(express.static(distPath, { index: false }))
+  app.use(express.static(distPath))
 
   // EXPRESS 5 FIX: Explicitly name the wildcard parameter using {*splat}
-  app.get('/{*splat}', (req, res) => {
+  app.get(/.*/, (req, res) => {
     const indexPath = path.resolve(distPath, 'index.html')
 
     fs.readFile(indexPath, 'utf8', (err, htmlData) => {
